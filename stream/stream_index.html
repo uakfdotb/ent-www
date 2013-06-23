@@ -1,0 +1,23 @@
+<!-- INCLUDE overall_header.html -->
+<LINK href="../donate.css" rel="stylesheet" type="text/css">
+<br />
+
+<h1>ENT Stream</h1>
+
+<p class="donate">Enter a gamename or username below to search for a game to stream. Then, it should appear in the list; then just click the game to get started. To join the game and start streaming it, read the <a href="https://entgaming.net/forum/viewtopic.php?f=5&t=8418">ENT Connect guide</a> and join the game called "Stream".</p>
+
+<form method="GET">
+<p class="donate">
+Gamename or username to stream: <input type="text" name="filter" />
+<input type="submit" value="Search" />
+</p>
+</form>
+
+<ul>
+<!-- BEGIN games -->
+<li class="donate"><a href="/entconnect/?stream={games.GAMENAME_URL}">{games.GAMENAME}</a></li>
+<!-- END games -->
+
+</ul>
+
+<!-- INCLUDE overall_footer.html -->

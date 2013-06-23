@@ -1,0 +1,36 @@
+<!-- INCLUDE overall_header.html -->
+<LINK href="../donate.css" rel="stylesheet" type="text/css">
+<br />
+
+<h1>EntLink: host</h1>
+
+<p class="donate">You can host a game on our public hosting game by filling out the form below. The gamename will be your forum username followed by two digits; after it's hosted, you can join it and then rename it with !pub NEW GAMENAME. Note that if you select the private game option, you will have to spoofcheck by whispering the bot with "sc".</p>
+
+<p class="donate"><b>Battle.net users:</b> it's easier to whisper our channel bot, see <a href="/forum/viewtopic.php?f=5&t=1054">our hosting guide</a> for details.</p>
+
+<p class="donate"><b>Can't find your favorite map?</b> First check the <a href="host_add.php">list of added maps</a>; if you find the map there, then just hit add and come back to this page. If you still don't see it, then you can upload it by going to <a href="/link/">ENT Link</a> and selecting "Upload your own map".</p>
+
+<form method="post" action="host.php">
+<p class="donate">
+Owner name (your in-game username): <input type="text" name="owner" value="{OWNER}" />
+<br />Map:
+	<select name="map">
+	<!-- BEGIN maps -->
+	<option value="{maps.MAP_NAME}">{maps.MAP_DESC}</option>
+	<!-- END maps -->
+	</select>
+<br />Location:
+	<select name="location">
+	<option value="atlanta">Atlanta (U.S. East)</option>
+	<option value="chicago">Chicago (U.S. Central)</option>
+	<option value="Seattle">Seattle (U.S. West)</option>
+	<option value="europe">Germany (Europe)</option>
+	</select>
+<br /><input type="checkbox" name="private" value="true" /> Make the game private (you can rehost it after joining the lobby)
+<br /><input type="submit" value="Host" />
+</p>
+</form>
+
+<p class="donate"><a href="./">Return to ENT Link home</a>.</p>
+
+<!-- INCLUDE overall_footer.html -->

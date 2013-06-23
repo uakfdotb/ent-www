@@ -1,0 +1,49 @@
+<!-- INCLUDE overall_header.html -->
+<LINK href="../donate.css" rel="stylesheet" type="text/css">
+<br />
+
+<h1>EntLink: personal bans</h1>
+
+<p class="donate">Your personal bans are listed below. You can remove a ban by clicking on the remove button, or add a new one using the form.</p>
+
+<p class="donate">Note: each ban is only associated with one account at a time. You can update all your bans to use a single account with the Update Bans button.</p>
+
+<form method="post" action="bans.php">
+<p class="donate">
+Username: <input type="text" name="ban_user" /><br />
+Realm: <select name="ban_realm"><option value="uswest.battle.net">USWest (Lordaeron)</option><option value="useast.battle.net">USEast (Azeroth)</option><option value="europe.battle.net">Europe (Northrend)</option><option value="asia.battle.net">Asia (Kalimador)</option><option value="entconnect">ENT Connect</option><option value="">LAN/Garena</option></select><br />
+Reason: <input type="text" name="ban_reason" /> (optional)<br />
+Account: <select name="account">
+	<!-- BEGIN accounts -->
+		<option value="{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}" <!-- IF accounts.ACCOUNT_COMBINED == DEFAULTACCOUNT -->selected<!-- ENDIF -->>{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}</option>
+	<!-- END accounts -->
+	</select><br />
+<input type="submit" name="action" value="Add ban" />
+<input type="submit" name="action" value="Update bans to use this account" />
+</p>
+</form>
+
+<table cellpadding="5px">
+<tr>
+	<th class="donate">Username</th>
+	<th class="donate" style="padding-left:5px;">Realm</th>
+	<th class="donate" style="padding-left:5px;">Context</th>
+	<th class="donate" style="padding-left:5px;">Reason</th>
+	<th class="donate" style="padding-left:5px;">Delete</th>
+</tr>
+
+<!-- BEGIN bans -->
+<tr>
+<td class="donate">{bans.BAN_NAME}</td>
+<td class="donate" style="padding-left:5px;">{bans.BAN_REALM}</td>
+<td class="donate" style="padding-left:5px;">{bans.BAN_CONTEXT}</td>
+<td class="donate" style="padding-left:5px;">{bans.BAN_REASON}</td>
+<td class="donate" style="padding-left:5px;"><form method="post" action="bans.php?action=delban&id={bans.BAN_ID}"><input type="submit" value="delete" /></form></td>
+</tr>
+<!-- END bans -->
+
+</table>
+
+<p class="donate"><a href="./">Return to ENT Link home</a>.</p>
+
+<!-- INCLUDE overall_footer.html -->

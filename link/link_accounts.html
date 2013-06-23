@@ -1,0 +1,31 @@
+<!-- INCLUDE overall_header.html -->
+<LINK href="../donate.css" rel="stylesheet" type="text/css">
+<br />
+
+<h1>EntLink: accounts</h1>
+
+<p class="donate">Battle.net accounts that you have validated will appear in the table below.</p>
+
+<table cellpadding="5px">
+<tr><th style="font-size:15px">Username</th><th style="font-size:15px">Realm</th><th style="font-size:15px">Delete</th></tr>
+
+<!-- BEGIN accounts -->
+<tr>
+<td style="font-size:15px">{accounts.ACCOUNT_NAME}</td>
+<td style="font-size:15px">{accounts.ACCOUNT_REALM}</td>
+<td style="font-size:15px">
+	<form method="post" action="accounts.php">
+	<input type="hidden" name="action" value="delete" />
+	<input type="hidden" name="username" value="{accounts.ACCOUNT_NAME}" />
+	<input type="hidden" name="realm" value="{accounts.ACCOUNT_REALM}" />
+	<input type="submit" value="Delete" />
+	</form>
+</td>
+</tr>
+<!-- END accounts -->
+
+</table>
+
+<p class="donate"><a href="./">Return to ENT Link home</a>.</p>
+
+<!-- INCLUDE overall_footer.html -->

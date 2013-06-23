@@ -1,0 +1,53 @@
+<!-- INCLUDE overall_header.html -->
+<LINK href="../donate.css" rel="stylesheet" type="text/css">
+<br />
+
+<h1>EntLink: add a map to host</h1>
+
+<p class="donate">Use the buttons below to add or remove a map from your list of maps to host.</p>
+
+<p class="donate"><a href="host.php">Click here to host a game.</a> <b>Don't see your desired map?</b> <a href="./">Return to ENT Link</a> and select Upload to upload a map.</p>
+
+<table>
+<tr>
+	<th class="donate">Map name</th>
+	<th class="donate">Uploader</th>
+	<th class="donate">Load code</th>
+	<th class="donate">Add/remove</th>
+</tr>
+
+<!-- BEGIN maps -->
+<tr>
+	<td class="donate">{maps.MAP_NAME}</td>
+	<td class="donate">{maps.MAP_USER}</td>
+	<td class="donate">{maps.MAP_LOAD}</td>
+	<td>
+		<form method="POST">
+		<input type="hidden" name="map_id" value="{maps.MAP_ID}" />
+		<input type="hidden" name="action" value="remove" />
+		<input type="submit" value="Remove" />
+		</form>
+	</td>
+</tr>
+<!-- END maps -->
+
+<!-- BEGIN othermaps -->
+<tr>
+	<td class="donate">{othermaps.MAP_NAME}</td>
+	<td class="donate">{othermaps.MAP_USER}</td>
+	<td class="donate">{othermaps.MAP_LOAD}</td>
+	<td>
+		<form method="POST">
+		<input type="hidden" name="map_id" value="{othermaps.MAP_ID}" />
+		<input type="hidden" name="action" value="add" />
+		<input type="submit" value="Add" />
+		</form>
+	</td>
+</tr>
+<!-- END othermaps -->
+
+</table>
+
+<p class="donate"><a href="./">Return to ENT Link home</a>.</p>
+
+<!-- INCLUDE overall_footer.html -->

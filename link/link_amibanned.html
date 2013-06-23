@@ -1,0 +1,36 @@
+<!-- INCLUDE overall_header.html -->
+<LINK href="../donate.css" rel="stylesheet" type="text/css">
+<br />
+
+<h1>EntLink: am I banned?</h1>
+
+<p class="donate">Any bans recorded on your accounts are listed below. If you don't see anything, you are most likely not banned.</p>
+
+<p class="donate">Your timezone is {TIMEZONE}. The current time is {TIME}. You can change your timezone preferences in the <a href="/forum/ucp.php?i=174">User Control Panel</a>.</p>
+
+<table cellpadding="5px">
+<tr>
+	<th style="font-size:15px">Username</th>
+	<th style="font-size:15px">Realm</th>
+	<th style="font-size:15px">Admin</th>
+	<th style="font-size:15px">Gamename</th>
+	<th style="font-size:15px">Reason</th>
+	<th style="font-size:15px">Expires</th>
+</tr>
+
+<!-- BEGIN bans -->
+<tr>
+<td style="font-size:15px">{bans.BAN_NAME}</td>
+<td style="font-size:15px">{bans.BAN_SERVER}</td>
+<td style="font-size:15px">{bans.BAN_ADMIN}</td>
+<td style="font-size:15px">{bans.BAN_GAMENAME}</td>
+<td style="font-size:15px">{bans.BAN_REASON}</td>
+<td style="font-size:15px">{bans.BAN_EXPIREDATE}</td>
+</tr>
+<!-- END bans -->
+
+</table>
+
+<p class="donate"><a href="./">Return to ENT Link home</a>.</p>
+
+<!-- INCLUDE overall_footer.html -->
