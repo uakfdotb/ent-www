@@ -81,7 +81,7 @@ if ($user->data['user_id'] == ANONYMOUS) {
 					$fail = true; //make sure account is validated
 				
 					foreach($array as $account) {
-						if(strtolower($account[0]) == $pinfo[0] && strtolower($account[1]) == $pinfo[1]) {
+						if(strtolower($account[0]) == $pinfo[0] && (strtolower($account[1]) == $pinfo[1] || empty($pinfo[1]))) {
 							$fail = false;
 						}
 					}
@@ -123,7 +123,7 @@ if ($user->data['user_id'] == ANONYMOUS) {
 		$account_name = $account[0];
 		$account_realm = $account[1];
 		
-		$banResult = databaseQuery("SELECT id, name, server, reason, context FROM bans WHERE context = ? OR context = ?", array("$account_name@$account_realm", $account_name));
+		$banResult = databaseQuery("SELECT id, name, server, reason, context FROM bans WHERE context = ? OR context = ? OR context = ?", array("$account_name@$account_realm", $account_name, "$account_name@"));
 		
 		while($banRow = $banResult->fetch()) {
 			$template->assign_block_vars('bans', array(
