@@ -60,26 +60,33 @@ if ($user->data['user_id'] == ANONYMOUS || !isbigadmin($user->data['user_id'])) 
 
 	<?
 
-	if(isset($_POST['ip']) && isset($_POST['reason'])) {
+	if(isset($_POST['ip']) && isset($_POST['reason']) && !empty($_POST['ip'])) {
 		$unban = false;
-
 		if(isset($_POST['unban']) && $_POST['unban'] == 'unban') $unban = true;
+		
+		if(!empty($_POST['reason']) || $unban) {
+			if($unban || (substr_count($_POST['ip'], ".") >= 2 && (substr_count($_POST['ip'], ".") >= 3 || $_POST['ip'][strlen($_POST['ip']) - 1] == "."))) {
+				$ip = $_POST['ip'];
+				$reason = $_POST['reason'];
 
-		$ip = $_POST['ip'];
-		$reason = $_POST['reason'];
+				if($reason == "") $reason = "Ban dodging";
 
-		if($reason == "") $reason = "Ban dodging";
+				$realm = "asia.battle.net";
+				adminLog("Range ban", "Range ban on $ip", $username_clean);
 
-		$realm = "asia.battle.net";
-		adminLog("Range ban", "Range ban on $ip", $username_clean);
+				echo "Banning/unbanning $ip* on $realm<br />";
 
-		echo "Banning/unbanning $ip* on $realm<br />";
-
-		//unban the user if we're supposed to
-		if($unban) {
-			databaseQuery("DELETE FROM bans WHERE ip = ? AND name = 'rangeban'", array(":$ip"));
+				//unban the user if we're supposed to
+				if($unban) {
+					databaseQuery("DELETE FROM bans WHERE ip = ? AND name = 'rangeban'", array(":$ip"));
+				} else {
+					databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context) VALUES ('0', ?, 'rangeban', ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL 1 year ), 'ttr.cloud')", array($realm, ":$ip", $username_clean, $reason));
+				}
+			} else {
+				echo "<p><b><i>Ban error: not enough dots in the IP address. You trying to ban everyone @karasu.?</i></b></p>";
+			}
 		} else {
-			databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context) VALUES ('0', ?, 'rangeban', ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL 1 year ), 'ttr.cloud')", array($realm, ":$ip", $username_clean, $reason));
+			echo "<p><b><i>Ban error: reason is blank!</i></b></p>";
 		}
 	}
 	?>
