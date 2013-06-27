@@ -26,6 +26,8 @@ function adminLog($action, $desc, $admin) {
 }
 
 function statsClear($username, $realm, $category, $admin_name) {
+	global $w3mmdCategories;
+
 	$message = "";
 	
 	if($category == "dota") {
@@ -39,7 +41,7 @@ function statsClear($username, $realm, $category, $admin_name) {
 		} else {
 			$message = "Error: no stats found to clear";
 		}
-	} else if($category == "treetag" || $category == "civwars" || $category == "battleships" || $category == "legionmega" || $category == "legionmega2" || $category == "castlefight" || $category == "cfone") {
+	} else if(isset($w3mmdCategories[$category])) {
 		//save old stats for log, also to check if it exists at all
 		$result = databaseQuery("SELECT score, games, wins, losses, intstats0, intstats1, intstats2, intstats3, intstats4, intstats5, intstats6, intstats7, doublestats0, doublestats1, doublestats2, doublestats3, id FROM w3mmd_elo_scores WHERE name = ? AND server = ? AND category = ?", array($username, $realm, $category));
 	
@@ -56,6 +58,8 @@ function statsClear($username, $realm, $category, $admin_name) {
 }
 
 function statsRestore($username, $realm, $category, $stats_string, $admin_name) {
+	global $w3mmdCategories;
+
 	$message = "";
 	
 	$array = explode(",", str_replace(array('{', '}'), array('', ''), $stats_string));
@@ -90,7 +94,7 @@ function statsRestore($username, $realm, $category, $stats_string, $admin_name) 
 		} else {
 			$message = "Error: stats string should have 13 entries.";
 		}
-	} else if($category == "treetag" || $category == "civwars" || $category == "battleships" || $category == "legionmega" || $category == "legionmega2" || $category == "castlefight" || $category == "cfone") {
+	} else if(isset($w3mmdCategories[$category])) {
 		if(count($array) == 16) {
 			//make sure no existing stats
 			$result = databaseQuery("SELECT COUNT(*) FROM w3mmd_elo_scores WHERE name = ? AND server = ? AND category = ?", array($username, $realm, $category));
