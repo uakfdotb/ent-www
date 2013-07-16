@@ -50,6 +50,8 @@ if ($user->data['user_id'] == ANONYMOUS || !isbigadmin($user->data['user_id'])) 
 	<h1>Range ban</h1>
 
 	<p>Bans IP range, only last digit. You must enter first three or four digits (four means single IP ban)! Will be a one-year ban.</p>
+	
+	<p>You can also ban hostname now, like "hentgaming.net" will ban anyone with entgaming.net in their rDNS hostname.</p>
 
 	<form method="POST" action="rangeban.php">
 	IP: <input type="text" name="ip" /> example: "4.3.2." to ban 4.3.2.*, or "4.3.2.1" to ban a single IP
@@ -65,7 +67,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isbigadmin($user->data['user_id'])) 
 		if(isset($_POST['unban']) && $_POST['unban'] == 'unban') $unban = true;
 		
 		if(!empty($_POST['reason']) || $unban) {
-			if($unban || (substr_count($_POST['ip'], ".") >= 2 && (substr_count($_POST['ip'], ".") >= 3 || $_POST['ip'][strlen($_POST['ip']) - 1] == "."))) {
+			if($unban || (substr_count($_POST['ip'], ".") >= 2 && (substr_count($_POST['ip'], ".") >= 3 || $_POST['ip'][strlen($_POST['ip']) - 1] == ".")) || ($_POST['ip'][0] == "h" && strlen($_POST['ip']) >= 5)) {
 				$ip = $_POST['ip'];
 				$reason = $_POST['reason'];
 
