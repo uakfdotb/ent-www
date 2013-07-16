@@ -85,7 +85,7 @@ function namelookup($ip) {
 		}
 		
 		if($counter >= 2) {
-			return databaseQuery("SELECT DISTINCT name, spoofedrealm FROM gameplayers WHERE ip LIKE ? LIMIT 40", array("$safe_ip%"));
+			return databaseQuery("SELECT DISTINCT name, spoofedrealm FROM gameplayers WHERE ip LIKE ? ORDER BY id DESC LIMIT 100", array("$safe_ip%"));
 		}
 	}
 	
