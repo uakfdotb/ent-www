@@ -64,12 +64,26 @@ if ($user->data['user_id'] == ANONYMOUS) {
 			$map = substr($map, 1);
 			$maptype = "load";
 		}
+		
+		$observers = 0;
+		
+		if(isset($_REQUEST['observers'])) {
+			$observers = 1;
+		}
 
-		databaseQuery("INSERT INTO gamequeue (realm, username, gamename, command, mapname, maptype, location) VALUES ('1', ?, ?, ?, ?, ?, ?)", array($owner, $gamename, $type, $map, $maptype, $location));
+		databaseQuery("INSERT INTO gamequeue (realm, username, gamename, command, mapname, maptype, location, obs) VALUES ('1', ?, ?, ?, ?, ?, ?, ?)", array($owner, $gamename, $type, $map, $maptype, $location, $observers));
 		$message = "The game should be hosted shortly (the gamename is your forum username followed by two digits; you can change this with !pub NEW GAMENAME after you join the game). If it doesn't host, make sure that you don't already have hosted and that the selected map is valid.<br /><br /><b>GAMENAME: $gamename</b>";
+		
+		//if user hasn't hosted in thirty minutes, increment host counter
+		if(time() - genericForumPreferencesGet($fuser, "link_host_time", 0) > 30 * 60) {
+			databaseQuery("UPDATE makemehost_maps SET count = count + 1 WHERE randname = ?", array(substr($_REQUEST['map'], 1)));
+		}
 		
 		//save the owner for future hosting
 		genericForumPreferencesSet($fuser, "link_host_owner", $_REQUEST['owner']);
+		
+		//also updated last host time
+		genericForumPreferencesSet($fuser, "link_host_time", time());
 	}
 
 	if($message) {

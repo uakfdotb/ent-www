@@ -55,26 +55,41 @@ if ($user->data['user_id'] == ANONYMOUS) {
 	}
 
 	//get maps added from other users
-	$result = databaseQuery("SELECT makemehost_maps.id, mapname, randname, user_id FROM link_maps, makemehost_maps WHERE link_maps.fuser = ? AND link_maps.mmh_map = makemehost_maps.id ORDER BY mapname", array($fuser));
+	
+	$sortby = "mapname";
+	
+	if(isset($_REQUEST['sortby'])) {
+		if($_REQUEST['sortby'] == "count") {
+			$sortby = "count DESC";
+		} else if($_REQUEST['sortby'] == "size") {
+			$sortby = "size";
+		}
+	}
+	
+	$result = databaseQuery("SELECT makemehost_maps.id, mapname, randname, user_id, size, count FROM link_maps, makemehost_maps WHERE link_maps.fuser = ? AND link_maps.mmh_map = makemehost_maps.id ORDER BY $sortby", array($fuser));
 
 	while($row = $result->fetch()) {
 		$template->assign_block_vars('maps', array(
 									'MAP_ID' => htmlspecialchars($row[0]),
 									'MAP_NAME' => htmlspecialchars($row[1]),
 									'MAP_USER' => htmlspecialchars(getMapUploaderName($row[3])),
-									'MAP_LOAD' => htmlspecialchars($row[2])
+									'MAP_LOAD' => htmlspecialchars($row[2]),
+									'MAP_SIZE' => htmlspecialchars($row[4]),
+									'MAP_COUNT' => htmlspecialchars($row[5])
 									));
 	}
 
 	//put all other maps in a separate list
-	$result = databaseQuery("SELECT makemehost_maps.id, mapname, randname, user_id FROM makemehost_maps WHERE makemehost_maps.id NOT IN (SELECT mmh_map FROM link_maps WHERE link_maps.fuser = ?) ORDER BY mapname", array($fuser));
+	$result = databaseQuery("SELECT makemehost_maps.id, mapname, randname, user_id, size, count FROM makemehost_maps WHERE makemehost_maps.id NOT IN (SELECT mmh_map FROM link_maps WHERE link_maps.fuser = ?) ORDER BY $sortby", array($fuser));
 
 	while($row = $result->fetch()) {
 		$template->assign_block_vars('othermaps', array(
 									'MAP_ID' => htmlspecialchars($row[0]),
 									'MAP_NAME' => htmlspecialchars($row[1]),
 									'MAP_USER' => htmlspecialchars(getMapUploaderName($row[3])),
-									'MAP_LOAD' => htmlspecialchars($row[2])
+									'MAP_LOAD' => htmlspecialchars($row[2]),
+									'MAP_SIZE' => htmlspecialchars($row[4]),
+									'MAP_COUNT' => htmlspecialchars($row[5])
 									));
 	}
 

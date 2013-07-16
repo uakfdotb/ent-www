@@ -10,9 +10,11 @@
 
 <table>
 <tr>
-	<th class="donate">Map name</th>
+	<th class="donate"><a href="host_add.php?sortby=mapname" style="color:maroon;">Map name</a></th>
 	<th class="donate">Uploader</th>
 	<th class="donate">Load code</th>
+	<th class="donate"><a href="host_add.php?sortby=count" style="color:maroon;">Times hosted</a></th>
+	<th class="donate"><a href="host_add.php?sortby=size" style="color:maroon;">Size (bytes)</a></th>
 	<th class="donate">Add/remove</th>
 </tr>
 
@@ -21,6 +23,8 @@
 	<td class="donate">{maps.MAP_NAME}</td>
 	<td class="donate">{maps.MAP_USER}</td>
 	<td class="donate">{maps.MAP_LOAD}</td>
+	<td class="donate">{maps.MAP_COUNT}</td>
+	<td class="donate">{maps.MAP_SIZE}</td>
 	<td>
 		<form method="POST">
 		<input type="hidden" name="map_id" value="{maps.MAP_ID}" />
@@ -36,6 +40,8 @@
 	<td class="donate">{othermaps.MAP_NAME}</td>
 	<td class="donate">{othermaps.MAP_USER}</td>
 	<td class="donate">{othermaps.MAP_LOAD}</td>
+	<td class="donate">{othermaps.MAP_COUNT}</td>
+	<td class="donate">{othermaps.MAP_SIZE}</td>
 	<td>
 		<form method="POST">
 		<input type="hidden" name="map_id" value="{othermaps.MAP_ID}" />
