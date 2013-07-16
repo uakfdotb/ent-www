@@ -65,9 +65,17 @@ if(isWhitelist($_SERVER['REMOTE_ADDR'])) {
 
 $array = array();
 alias($player[0], $player[1], $depth, $array, $hours);
-$players = array_keys($array);
+$players = array();
 
-foreach($players as $p_str) {
+//construct map from player info string to last time played
+foreach($array as $p_str => $ignore) {
+	$p_info = getPlayer($p_str);
+	$players[$p_str] = strtotime(lastTimePlayed($p_info[0]));
+}
+
+arsort($players);
+
+foreach($players as $p_str => $ignore) {
 	$p_info = getPlayer($p_str);
 	
 	echo "<tr>\n";
