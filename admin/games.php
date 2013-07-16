@@ -47,6 +47,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	include("../include/host.php");
 
 	$result = databaseQuery("SELECT gamename, usernames FROM gamelist WHERE lobby = 1 AND gamename != '' AND REPLACE(usernames, '\\t', '') != '' ORDER BY id DESC");
+	$start_time = time();
 
 	while($row = $result->fetch()) {
 		$gamename = htmlspecialchars($row[0]);
@@ -82,6 +83,10 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		}
 
 		echo "</table>";
+
+		if(time() - $start_time > 10) {
+			die("Exceeded time limit.");
+		}
 	}
 }
 ?>
