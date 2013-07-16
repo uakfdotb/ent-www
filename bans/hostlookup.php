@@ -55,6 +55,11 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		} else if($_REQUEST['filter_type'] == "name") {
 			$where = "name = ?";
 		}
+		
+		if(!empty($_REQUEST['gamename'])) {
+			$where .= " AND gamename LIKE ?";
+			$parameters[] = "%" . $_REQUEST['gamename'] . "%";
+		}
 	}
 
 	//timezone stuff
@@ -72,10 +77,11 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<form method="get">
 	Filter: <input type="text" name="filter" />
 	<select name="filter_type">
-		<option value="host">Hostname</option>
-		<option value="name">Username</option>
+		<option value="host">Filter by hostname</option>
+		<option value="name">Filter by username</option>
 	</select>
-	<input type="submit" value="Filter" />
+	<br />Gamename: <input type="text" name="gamename" /> leave this blank unless you're stupid
+	<br /><input type="submit" value="Filter" />
 	</form>
 	<?
 
