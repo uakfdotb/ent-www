@@ -29,7 +29,7 @@ $hostsResult = databaseQuery("SELECT COUNT(*) FROM hosts");
 $hostsRow = $hostsResult->fetch();
 
 if($hostsRow[0] > 75000) {
-	mysql_query("DELETE FROM hosts ORDER BY id LIMIT " . ($hostsRow[0] - 75000));
+	databaseQuery("DELETE FROM hosts ORDER BY id LIMIT " . ($hostsRow[0] - 75000));
 }
 
 function getHost($ip) {
