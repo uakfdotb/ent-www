@@ -85,6 +85,11 @@ $row = $result->fetch();
 
 echo "<tr><td>Longest game</td><td>" . $row[1] . " at " . round($row[2] / 3600, 2) . " hours (gid=" . $row[0] . ")</td></tr>";
 
+$result = databaseQuery("SELECT SUM(playingtime/3600/24/365) FROM gametrack");
+$row = $result->fetch();
+
+echo "<tr><td>Total game time</td><td>" . round($row[0], 2) . " years</td></tr>";
+
 ?>
 
 </table>
