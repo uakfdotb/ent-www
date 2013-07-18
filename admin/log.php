@@ -60,6 +60,8 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		$filterElement = "%" . $_REQUEST['filter'] . "%";
 		$filter = "WHERE admin LIKE ? OR `desc` LIKE ? OR action LIKE ?";
 		$parameters = array($filterElement, $filterElement, $filterElement);
+	} else {
+		$filter = "WHERE admin NOT LIKE '%stats-strip'";
 	}
 	
 	$prev = $n - 1;
