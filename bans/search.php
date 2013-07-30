@@ -91,15 +91,16 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 			}
 			
 			//grab general statistics
-			$result = databaseQuery("SELECT time_created, time_active, num_games, (total_leftpercent / num_games)*100, lastgames, ROUND(playingtime / 3600) FROM gametrack $where", $parameters);
+			$result = databaseQuery("SELECT time_created, time_active, num_games, (total_leftpercent / num_games)*100, (num_autoban / num_games)*100, lastgames, ROUND(playingtime / 3600) FROM gametrack $where", $parameters);
 			$row = $result->fetch();
 			
 			$firstgame = uxtDate(convertTime($row[0]));
 			$lastgame = uxtDate(convertTime($row[1]));
 			$totalgames = $row[2];
 			$staypercent = $row[3];
-			$lastgames = $row[4];
-			$playingtime = $row[5];
+			$leftpercent = $row[4];
+			$lastgames = $row[5];
+			$playingtime = $row[6];
 			
 			echo "<h2>" . htmlspecialchars($username) . "@" . htmlspecialchars($realm_it) . "</h2>";
 			
@@ -111,6 +112,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 				echo "<tr><td>Last game</td><td>" . $lastgame . "</td></tr>";
 				echo "<tr><td>Total games</td><td>" . $totalgames . "</td></tr>";
 				echo "<tr><td>Stay percent</td><td>" . $staypercent . "</td></tr>";
+				echo "<tr><td>Left percent</td><td>" . $leftpercent . "</td></tr>";
 				echo "<tr><td>Playing time</td><td>" . $playingtime . " hours</td></tr>";
 				echo "</table>";
 			
