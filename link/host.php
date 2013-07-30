@@ -70,20 +70,34 @@ if ($user->data['user_id'] == ANONYMOUS) {
 		if(isset($_REQUEST['observers'])) {
 			$observers = 1;
 		}
-
-		databaseQuery("INSERT INTO gamequeue (realm, username, gamename, command, mapname, maptype, location, obs) VALUES ('1', ?, ?, ?, ?, ?, ?, ?)", array($owner, $gamename, $type, $map, $maptype, $location, $observers));
-		$message = "The game should be hosted shortly (the gamename is your forum username followed by two digits; you can change this with !pub NEW GAMENAME after you join the game). If it doesn't host, make sure that you don't already have hosted and that the selected map is valid.<br /><br /><b>GAMENAME: $gamename</b>";
 		
-		//if user hasn't hosted in thirty minutes, increment host counter
-		if(time() - genericForumPreferencesGet($fuser, "link_host_time", 0) > 30 * 60) {
-			databaseQuery("UPDATE makemehost_maps SET count = count + 1 WHERE randname = ?", array(substr($_REQUEST['map'], 1)));
+		//make sure no games like this already
+		$result = databaseQuery("SELECT COUNT(*) FROM gamequeue WHERE username = ? OR gamename LIKE ?", array($owner, "{$fuser}__"));
+		$row = $result->fetch();
+		
+		if($row[0] > 0) {
+			$message = "Error hosting game: you appear to already have a game in the hosting queue. Please <a href=\"host.php\">go back to the hosting page</a> and check the queue to see the status of hosting your game.";
+		} else {
+			$result = databaseQuery("SELECT gamename FROM gamelist WHERE (ownername = ? OR gamename LIKE ?) AND lobby = 1", array($owner, "{$fuser}__"));
+			
+			if($row = $result->fetch()) {
+				$message = "Error hosting game: you appear to already have a game hosted. Check the <a href=\"/forum/games.php\">game list</a> (the gamename is <b>" . htmlspecialchars($row[0]) . "</b>).";
+			} else {
+				databaseQuery("INSERT INTO gamequeue (realm, username, gamename, command, mapname, maptype, location, obs) VALUES ('1', ?, ?, ?, ?, ?, ?, ?)", array($owner, $gamename, $type, $map, $maptype, $location, $observers));
+				$message = "The game should be hosted shortly (the gamename is your forum username followed by two digits; you can change this with !pub NEW GAMENAME after you join the game). If it doesn't host, make sure that you don't already have hosted and that the selected map is valid.<br /><br /><b>GAMENAME: $gamename</b><br /><br />Note: if there are too many games hosted, your host request may be queued. You can <a href=\"host.php\">check the queue status here</a>.";
+		
+				//if user hasn't hosted in thirty minutes, increment host counter
+				if(time() - genericForumPreferencesGet($fuser, "link_host_time", 0) > 30 * 60) {
+					databaseQuery("UPDATE makemehost_maps SET count = count + 1 WHERE randname = ?", array(substr($_REQUEST['map'], 1)));
+				}
+		
+				//save the owner for future hosting
+				genericForumPreferencesSet($fuser, "link_host_owner", $_REQUEST['owner']);
+		
+				//also updated last host time
+				genericForumPreferencesSet($fuser, "link_host_time", time());
+			}
 		}
-		
-		//save the owner for future hosting
-		genericForumPreferencesSet($fuser, "link_host_owner", $_REQUEST['owner']);
-		
-		//also updated last host time
-		genericForumPreferencesSet($fuser, "link_host_time", time());
 	}
 
 	if($message) {
@@ -118,6 +132,21 @@ if ($user->data['user_id'] == ANONYMOUS) {
 		//also get the default owner to use
 		$owner = genericForumPreferencesGet($fuser, "link_host_owner", $fuser);
 		$template->assign_var('OWNER', htmlspecialchars($owner));
+		
+		//oh and the hosting queue for each location
+		$locations = array("seattle", "europe", "atlanta", "chicago");
+		
+		foreach($locations as $location) {
+			$result = databaseQuery("SELECT username, gamename, position FROM gamequeue_status WHERE location = ? ORDER BY position", array($location));
+			
+			while($row = $result->fetch()) {
+				$template->assign_block_vars("queue_$location", array(
+											 'QUEUE_USER' => htmlspecialchars($row[0]),
+											 'QUEUE_GAMENAME' => htmlspecialchars($row[1]),
+											 'QUEUE_POSITION' => htmlspecialchars($row[2])
+											));
+			}
+		}
 
 		$template->set_filenames(array('body' => 'link_host.html'));
 	}

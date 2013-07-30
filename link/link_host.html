@@ -23,7 +23,7 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 	<select name="location">
 	<option value="atlanta">Atlanta (U.S. East)</option>
 	<option value="chicago">Chicago (U.S. Central)</option>
-	<option value="Seattle">Seattle (U.S. West)</option>
+	<option value="seattle">Seattle (U.S. West)</option>
 	<option value="europe">Germany (Europe)</option>
 	</select>
 <br /><input type="checkbox" name="private" value="true" /> Make the game private (you can rehost it after joining the lobby)
@@ -31,6 +31,35 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 <br /><input type="submit" value="Host" />
 </p>
 </form>
+
+<p class="donate">The queue status for each location appears below.</p>
+
+<ul>
+<li class="donate">Atlanta (U.S. East)</li>
+<ol>
+<!-- BEGIN queue_atlanta -->
+<li class="donate" style="margin-left:20px">{queue_atlanta.QUEUE_GAMENAME} (by {queue_atlanta.QUEUE_USER})</li>
+<!-- END queue_atlanta -->
+</ol>
+<li class="donate">Chicago (U.S. Central)</li>
+<ol>
+<!-- BEGIN queue_chicago -->
+<li class="donate" style="margin-left:20px">{queue_chicago.QUEUE_GAMENAME} (by {queue_chicago.QUEUE_USER})</li>
+<!-- END queue_chicago -->
+</ol>
+<li class="donate">Seattle (U.S. West)</li>
+<ol>
+<!-- BEGIN queue_seattle -->
+<li class="donate" style="margin-left:20px">{queue_seattle.QUEUE_GAMENAME} (by {queue_seattle.QUEUE_USER})</li>
+<!-- END queue_seattle -->
+</ol>
+<li class="donate">Germany (Europe)</li>
+<ol>
+<!-- BEGIN queue_europe -->
+<li class="donate" style="margin-left:20px">{queue_europe.QUEUE_GAMENAME} (by {queue_europe.QUEUE_USER})</li>
+<!-- END queue_europe -->
+</ol>
+</ul>
 
 <p class="donate"><a href="./">Return to ENT Link home</a>.</p>
 
