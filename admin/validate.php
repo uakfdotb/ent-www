@@ -119,12 +119,12 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		$array[$row[1]][] = $row[0];
 	}
 	
-	$result = databaseQuery("SELECT v1.buser, v1.brealm FROM validate AS v1 LEFT JOIN validate AS v2 ON v1.buser = v2.buser AND v1.brealm = v2.brealm AND v1.fuser != v2.fuser WHERE v1.`key` = '' AND v2.`key` = ''");
+	//$result = databaseQuery("SELECT v1.buser, v1.brealm FROM validate AS v1 LEFT JOIN validate AS v2 ON v1.buser = v2.buser AND v1.brealm = v2.brealm AND v1.fuser != v2.fuser WHERE v1.`key` = '' AND v2.`key` = ''");
 	$problematic = array();
 	
-	while($row = $result->fetch()) {
+	/*while($row = $result->fetch()) {
 		$problematic[] = array($row[0], $row[1]);
-	}
+	}*/
 	
 	?>
 	
