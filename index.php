@@ -86,7 +86,7 @@ $template->assign_block_vars('announcements', array(
 ));
 }
 
-page_header('ENT Gaming - Announcements');
+page_header('Announcements');
 
 $template->set_filenames(array(
 'body' => 'announcements.html'
