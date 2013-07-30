@@ -21,7 +21,7 @@
 
 */
 
-if(!isset($id) && isset($_REQUEST['id'])) {
+if(!isset($id) && !empty($_REQUEST['id'])) {
 	$id = $_REQUEST['id'];
 }
 
