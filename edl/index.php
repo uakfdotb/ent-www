@@ -63,11 +63,11 @@ $result = databaseQuery("SELECT name, voucher, datetime FROM league_list WHERE c
 
 ?>
 <html>
-<head><title>EIHL Management</title></head>
+<head><title>EDL Management</title></head>
 <body>
-<h1>EIHL Management</h1>
+<h1>EDL Management</h1>
 
-<p>If you were looking for more information on EIHL, you are in the wrong place. Instead, go to <a href="/ihl">http://entgaming.net/ihl</a>.</p>
+<p>If you were looking for more information on EDL, you are in the wrong place. Instead, go to <a href="/ihl">http://entgaming.net/ihl</a>.</p>
 
 <? if($isadmin) { ?>
 	<form action="index.php" method="get">
