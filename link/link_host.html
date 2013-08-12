@@ -23,6 +23,7 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 	<select name="location">
 	<option value="atlanta">Atlanta (U.S. East)</option>
 	<option value="chicago">Chicago (U.S. Central)</option>
+	<option value="la">Los Angeles (U.S. West)</option>
 	<option value="seattle">Seattle (U.S. West)</option>
 	<option value="europe">Germany (Europe)</option>
 	</select>
@@ -31,6 +32,8 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 <br /><input type="submit" value="Host" />
 </p>
 </form>
+
+<p class="donate"><b><i>Advertisement: Get your own Warcraft III host bot at <a href="https://lunaghost.com/ghost">Luna Ghost</a> for $18.00/year with the <b>JULY2013A</b> promotional code (<a href="https://lunaghost.com/order.php?location=atlanta&cdkey=0&cycle=1&method=0&promocode=JULY2013A&promo=Submit">direct order link</a>).</i></b></p>
 
 <p class="donate">The queue status for each location appears below.</p>
 
@@ -46,6 +49,12 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 <!-- BEGIN queue_chicago -->
 <li class="donate" style="margin-left:20px">{queue_chicago.QUEUE_GAMENAME} (by {queue_chicago.QUEUE_USER})</li>
 <!-- END queue_chicago -->
+</ol>
+<li class="donate">Los Angeles (U.S. West)</li>
+<ol>
+<!-- BEGIN queue_la -->
+<li class="donate" style="margin-left:20px">{queue_la.QUEUE_GAMENAME} (by {queue_la.QUEUE_USER})</li>
+<!-- END queue_la -->
 </ol>
 <li class="donate">Seattle (U.S. West)</li>
 <ol>

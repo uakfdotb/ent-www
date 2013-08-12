@@ -54,7 +54,7 @@ if ($user->data['user_id'] == ANONYMOUS) {
 			$type = "priv";
 		}
 
-		if($location != "atlanta" && $location != "chicago" && $location != "seattle" && $location != "europe") {
+		if($location != "atlanta" && $location != "chicago" && $location != "seattle" && $location != "europe" && $location != "la") {
 			$location = "atlanta";
 		}
 
@@ -134,7 +134,7 @@ if ($user->data['user_id'] == ANONYMOUS) {
 		$template->assign_var('OWNER', htmlspecialchars($owner));
 		
 		//oh and the hosting queue for each location
-		$locations = array("seattle", "europe", "atlanta", "chicago");
+		$locations = array("seattle", "europe", "atlanta", "chicago", "la");
 		
 		foreach($locations as $location) {
 			$result = databaseQuery("SELECT username, gamename, position FROM gamequeue_status WHERE location = ? ORDER BY position", array($location));
