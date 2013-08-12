@@ -205,7 +205,9 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 			<option value="">Not spoof checked</option>
 			</select>
 		<br />Category: <select name="category">
-			<option value="dota">DotA</option>
+			<? foreach($dotaCategories as $i_cat => $i_name) { ?>
+			<option value="<?= $i_cat ?>"><?= $i_name ?></option>
+			<? } ?>
 			<? foreach($w3mmdCategories as $i_cat => $i_name) { ?>
 			<option value="<?= $i_cat ?>"><?= $i_name ?></option>
 			<? } ?>
@@ -229,7 +231,9 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 			<option value="">Not spoof checked</option>
 			</select>
 		<br />Category: <select name="category">
-			<option value="dota">DotA</option>
+			<? foreach($dotaCategories as $i_cat => $i_name) { ?>
+			<option value="<?= $i_cat ?>"><?= $i_name ?></option>
+			<? } ?>
 			<? foreach($w3mmdCategories as $i_cat => $i_name) { ?>
 			<option value="<?= $i_cat ?>"><?= $i_name ?></option>
 			<? } ?>
@@ -257,7 +261,9 @@ W3MMD format: {score, games, wins, losses, ... twelve more values that vary by c
 			</select>
 		<br />Stats string: <input type="text" name="stats" /> this is what you get in {} when you delete stats; ex: "{0, 1, 0}"
 		<br />Category: <select name="category">
-			<option value="dota">DotA</option>
+			<? foreach($dotaCategories as $i_cat => $i_name) { ?>
+			<option value="<?= $i_cat ?>"><?= $i_name ?></option>
+			<? } ?>
 			<? foreach($w3mmdCategories as $i_cat => $i_name) { ?>
 			<option value="<?= $i_cat ?>"><?= $i_name ?></option>
 			<? } ?>
