@@ -139,4 +139,26 @@ $idToServer = array(
 	'403' => 's10',
 	'404' => 's10',);
 
+function getBotName($botid) {
+	if($botid < 100) {
+		return "ENT$botid";
+	} else if($botid < 101) {
+		return "ENT)RAND";
+	} else if($botid < 200) {
+		return "Ent.Hosting" . ($botid - 100);
+	} else if($botid < 300) {
+		return "Ent.Chicago" . ($botid - 200);
+	} else if($botid < 400) {
+		return "Ent.Europe" . ($botid - 300);
+	} else if($botid < 500) {
+		return "Ent.Seattle" . ($botid - 400);
+	} else if($botid < 600) {
+		return "AMH" . ($botid - 500);
+	} else if($botid < 700) {
+		return "Ent.LA" . ($botid - 600);
+	} else {
+		return "Unknown";
+	}
+}
+
 ?>

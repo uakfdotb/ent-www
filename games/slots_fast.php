@@ -43,9 +43,10 @@ if(!isset($id) || $id == 0) {
 
 	include("../include/common.php");
 	include("../include/dbconnect.php");
+	include("../include/botlocate.php");
 }
 
-$result = databaseQuery("SELECT botid, gamename, usernames, lobby FROM gamelist WHERE id = ?", array($id));
+$result = databaseQuery("SELECT botid, gamename, usernames, lobby, ownername FROM gamelist WHERE id = ?", array($id));
 if($row = $result->fetch()) {
 	$botid = $row[0];
 
@@ -68,7 +69,11 @@ if($row = $result->fetch()) {
 	}
 ?>
 
-	<h2>Gamename: <?= $row[1] ?></h2>
+	<h2>Gamename: <?= $row[1] ?>
+	<br />Bot name: <?= getBotName($row[0]) ?>
+	<? if($botid > 100 && !empty($row[4])) { ?>
+		<br />Owner: <?= $row[4] ?>
+	<? } ?></h2>
 	<table>
 	<tr>
 		<th class="games">Username</th>
