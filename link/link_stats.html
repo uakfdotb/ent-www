@@ -1,0 +1,64 @@
+<!-- INCLUDE overall_header.html -->
+<LINK href="../donate.css" rel="stylesheet" type="text/css">
+<br />
+
+<h1>EntLink: stats manager</h1>
+
+<p class="donate">You can use this tool to transfer stats between accounts, or to reset your stats. You must have fifteen games to clear your stats; you also need fifteen games played on the source account to transfer stats (but target account can be new).</p>
+
+<p class="donate">If you don't see your account in the dropdown menu, you have to <a href="validate.php">validate it</a> first.</p>
+
+<h2>Clear stats</h2>
+
+<form method="POST" onsubmit="return confirm('Are you sure you want to clear your statistics?');">
+{S_FORM_TOKEN}
+<input type="hidden" name="action" value="clear" />
+<p class="donate">
+Account: <select name="account">
+<!-- BEGIN accounts -->
+<option name="{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}">{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}</option>
+<!-- END accounts -->
+</select>
+<br />Category: <select name="category">
+<!-- BEGIN dotacat -->
+<option value="{dotacat.CATEGORY}">{dotacat.CATNAME}</option>
+<!-- END dotacat -->
+<!-- BEGIN w3mmdcat -->
+<option value="{w3mmdcat.CATEGORY}">{w3mmdcat.CATNAME}</option>
+<!-- END w3mmdcat -->
+</select>
+<br /><input type="submit" value="Reset my statistics" />
+</p>
+</form>
+
+<h2>Tranfer stats</h2>
+
+<form method="POST" onsubmit="return confirm('Are you sure you want to transfer your statistics?');">
+{S_FORM_TOKEN}
+<input type="hidden" name="action" value="transfer" />
+<p class="donate">
+Source account: <select name="source">
+<!-- BEGIN accounts -->
+<option name="{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}">{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}</option>
+<!-- END accounts -->
+</select>
+<br />Target account: <select name="target">
+<!-- BEGIN accounts -->
+<option name="{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}">{accounts.ACCOUNT_NAME}@{accounts.ACCOUNT_REALM}</option>
+<!-- END accounts -->
+</select>
+<br />Category: <select name="category">
+<!-- BEGIN dotacat -->
+<option value="{dotacat.CATEGORY}">{dotacat.CATNAME}</option>
+<!-- END dotacat -->
+<!-- BEGIN w3mmdcat -->
+<option value="{w3mmdcat.CATEGORY}">{w3mmdcat.CATNAME}</option>
+<!-- END w3mmdcat -->
+</select>
+<br /><input type="submit" value="Transfer stats" />
+</p>
+</form>
+
+<p class="donate"><a href="./">Return to ENT Link home</a>.</p>
+
+<!-- INCLUDE overall_footer.html -->
