@@ -23,7 +23,7 @@
 
 $cachefile = "gamescache/games_all.cache";
 
-if(file_exists($cachefile) && time() - filemtime($cachefile) < 10) {
+if(file_exists($cachefile) && time() - filemtime($cachefile) < 5) {
 	echo file_get_contents('gamescache/games_all.cache');
 	return;
 }

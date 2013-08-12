@@ -34,7 +34,7 @@ if(!isset($id) || $id == 0) {
 
 	$cachefile = "gamescache/slots.$id.cache";
 
-	if(file_exists($cachefile) && time() - filemtime($cachefile) < 10) {
+	if(file_exists($cachefile) && time() - filemtime($cachefile) < 5) {
 		echo file_get_contents($cachefile);
 		return;
 	}
