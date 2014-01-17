@@ -46,19 +46,30 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 
 	$where = "";
 	$parameters = array();
+	$ignorebannedchecked = "";
 
 	if(isset($_REQUEST['filter']) && isset($_REQUEST['filter_type'])) {
 		$parameters[] = $_REQUEST['filter'];
 
 		if($_REQUEST['filter_type'] == "host") {
-			$where = "hostname LIKE ?";
+			$where = "gameplayers.hostname LIKE ?";
 		} else if($_REQUEST['filter_type'] == "name") {
-			$where = "name = ?";
+			$where = "gameplayers.name = ?";
 		}
-		
+
 		if(!empty($_REQUEST['gamename'])) {
-			$where .= " AND gamename LIKE ?";
+			$where .= " AND games.gamename LIKE ?";
 			$parameters[] = "%" . $_REQUEST['gamename'] . "%";
+		}
+
+		if(!empty($_REQUEST['maxdays'])) {
+			$interval = intval($_REQUEST['maxdays']);
+			$where .= " AND gametrack.time_created > DATE_SUB(NOW(), INTERVAL $interval DAY)";
+		}
+
+		if(isset($_REQUEST['ignorebanned']) && $_REQUEST['ignorebanned'] == 'yes') {
+			$where .= " AND (SELECT COUNT(*) FROM bans WHERE bans.name = gameplayers.name AND bans.server = gameplayers.spoofedrealm) = 0";
+				$ignorebannedchecked = "checked";
 		}
 	}
 
@@ -77,10 +88,12 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<form method="get">
 	Filter: <input type="text" name="filter" />
 	<select name="filter_type">
-		<option value="host">Filter by hostname</option>
-		<option value="name">Filter by username</option>
+		<option value="host" <? if($_REQUEST['filter_type'] == "host") {echo "selected";} ?>>Filter by hostname</option>
+		<option value="name" <? if($_REQUEST['filter_type'] == "name") {echo "selected";} ?>>Filter by username</option>
 	</select>
-	<br />Gamename: <input type="text" name="gamename" /> leave this blank unless you're stupid
+	<br />Gamename: <input type="text" name="gamename" value="<?= htmlentities($_REQUEST['gamename']) ?>" /> leave this blank unless you're stupid
+	<br />Account first seen in last ? days: <input type="text" name="maxdays" value="<?= htmlentities($_REQUEST['maxgames']) ?>" /> leave this blank unless you're stupid
+	<br /><input type="checkbox" name="ignorebanned" value="yes" <?= $ignorebannedcheckde ?> /> Ignore banned players
 	<br /><input type="submit" value="Filter" />
 	</form>
 	<?
@@ -92,7 +105,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 
 		<?
 
-		$result = databaseQuery("SELECT DISTINCT name, spoofedrealm, ip, hostname FROM gameplayers, games WHERE gameplayers.gameid = games.id AND games.datetime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND $where ORDER BY gameplayers.id DESC LIMIT 50", $parameters);
+		$result = databaseQuery("SELECT DISTINCT gameplayers.name, gameplayers.spoofedrealm, gameplayers.ip, gameplayers.hostname FROM gameplayers, games, gametrack WHERE gameplayers.gameid = games.id AND games.datetime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND gametrack.name = gameplayers.name AND gametrack.realm = gameplayers.spoofedrealm AND $where ORDER BY gameplayers.id DESC LIMIT 50", $parameters);
 
 		while($row = $result->fetch()) {
 			echo "<tr>";
