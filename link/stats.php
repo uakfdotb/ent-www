@@ -47,18 +47,18 @@ if ($user->data['user_id'] == ANONYMOUS) {
 
 	$message = false;
 	$array = listValidated($fuser);
-	
+
 	foreach($array as $account) {
 	    $template->assign_block_vars('accounts', array(
 									'ACCOUNT_NAME' => $account[0],
 									'ACCOUNT_REALM' => $account[1],
 									));
 	}
-	
+
 	foreach($w3mmdCategories as $category => $catname) {
 		$template->assign_block_vars('w3mmdcat', array('CATEGORY' => $category, 'CATNAME' => $catname));
 	}
-	
+
 	foreach($dotaCategories as $category => $catname) {
 		$template->assign_block_vars('dotacat', array('CATEGORY' => $category, 'CATNAME' => $catname));
 	}
@@ -66,29 +66,29 @@ if ($user->data['user_id'] == ANONYMOUS) {
 	if(isset($_POST['action'])) {
 		if(check_form_key('link_stats')) { //CSRF protection
 			if(time() - genericForumPreferencesGet($fuser, "link_stats_last_action", 0) >= 600) { //flood protection
-				if($_POST['action'] == "transfer" && isset($_POST['source']) && isset($_POST['target']) && isset($_POST['category'])) {
+				if($_POST['action'] == "swap" && isset($_POST['source']) && isset($_POST['target']) && isset($_POST['category'])) {
 					//check validation and no same source/target
 					$source_info = getPlayer($_POST['source']);
 					$target_info = getPlayer($_POST['target']);
 					$isSourceValidated = isValidated($source_info[0], $source_info[1]);
 					$isTargetValidated = isValidated($target_info[0], $target_info[1]);
-			
+
 					if(($source_info[0] != $target_info[0] || $source_info[1] != $target_info[1]) && $isSourceValidated !== false && $isSourceValidated == $fuser && $isTargetValidated !== false && $isTargetValidated == $fuser) {
-						$message = statsTransfer($source_info[0], $source_info[1], $target_info[0], $target_info[1], $_POST['category'], $fuser, false);
+						$message = statsTransfer($source_info[0], $source_info[1], $target_info[0], $target_info[1], $_POST['category'], $fuser, true, true);
 					} else {
 						$message = "Invalid source/target account. This incident has been reported to the ENT web administration team.";
 					}
 				} else if($_POST['action'] == "clear" && isset($_POST['account']) && isset($_POST['category'])) {
 					$p_info = getPlayer($_POST['account']);
 					$isValidated = isValidated($p_info[0], $p_info[1]);
-			
+
 					if($isValidated != false && $isValidated == $fuser) {
 						$message = statsClear($p_info[0], $p_info[1], $_POST['category'], $fuser, false);
 					} else {
 						$message = "Invalid account specified. This incident has been reported to the ENT web administration team.";
 					}
 				}
-				
+
 				if($statsLastResult) {
 					genericForumPreferencesSet($fuser, "link_stats_last_action", time());
 				} else if(empty($message)) {
