@@ -56,6 +56,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isbigadmin($user->data['user_id'])) 
 	<form method="POST" action="rangeban.php">
 	IP: <input type="text" name="ip" /> example: "4.3.2." to ban 4.3.2.*, or "4.3.2.1" to ban a single IP
 	<br />Reason: <input type="text" name="reason" />
+	<br />Bot ID: <input type="text" name="targetbot" /> (enter a bot ID to only ban on one specific bot; otherwise leave blank)
 	<br /><input type="checkbox" name="unban" value="unban" /> Unban user (if not checked, user will be banned)
 	<br /><input type="submit" value="Ban user" />
 	</form>
@@ -70,6 +71,11 @@ if ($user->data['user_id'] == ANONYMOUS || !isbigadmin($user->data['user_id'])) 
 			if($unban || (substr_count($_POST['ip'], ".") >= 2 && (substr_count($_POST['ip'], ".") >= 3 || $_POST['ip'][strlen($_POST['ip']) - 1] == ".")) || ($_POST['ip'][0] == "h" && strlen($_POST['ip']) >= 5)) {
 				$ip = $_POST['ip'];
 				$reason = $_POST['reason'];
+				$targetbot = $_POST['targetbot'];
+
+				if(empty($targetbot)) {
+					$targetbot = 0;
+				}
 
 				if($reason == "") $reason = "Ban dodging";
 
@@ -82,7 +88,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isbigadmin($user->data['user_id'])) 
 				if($unban) {
 					databaseQuery("DELETE FROM bans WHERE ip = ? AND name = 'rangeban'", array(":$ip"));
 				} else {
-					databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context) VALUES ('0', ?, 'rangeban', ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL 1 year ), 'ttr.cloud')", array($realm, ":$ip", $username_clean, $reason));
+					databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context, targetbot) VALUES ('0', ?, 'rangeban', ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL 1 year ), 'ttr.cloud', ?)", array($realm, ":$ip", $username_clean, $reason, $targetbot));
 				}
 			} else {
 				echo "<p><b><i>Ban error: not enough dots in the IP address. You trying to ban everyone @karasu.?</i></b></p>";
