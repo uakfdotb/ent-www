@@ -46,12 +46,12 @@ if(!isset($id) || $id == 0) {
 	include("../include/botlocate.php");
 }
 
-$result = databaseQuery("SELECT botid, gamename, usernames, lobby, ownername FROM gamelist WHERE id = ?", array($id));
+$result = databaseQuery("SELECT botid, gamename, usernames, lobby, ownername, IFNULL(TIMESTAMPDIFF(SECOND, eventtime, NOW()), '-1') FROM gamelist WHERE id = ?", array($id));
 if($row = $result->fetch()) {
 	$botid = $row[0];
 
 	$mode = "";
-	
+
 	if($row[3] == 1) {
 		if(strpos(strtolower($row[1]), "lod") !== FALSE) $mode = "lod";
 		else if(strpos(strtolower($row[1]), "eihl") !== FALSE) $mode = "eihl";
@@ -61,11 +61,12 @@ if($row = $result->fetch()) {
 		else if($botid == 18 || $botid == 57 || $botid == 79 || $botid == 96) $mode = "legionmega";
 		else if(strpos(strtolower($row[1]), "lihl") !== FALSE) $mode = "lihl";
 		else if($botid == 16) $mode = "civwars";
-		else if($botid == 65) $mode = "battleships";
 		else if($botid == 82) $mode = "rvs";
 		else if($botid == 54) $mode = "herolinewars";
 		else if($botid == 60) $mode = "islanddefense";
 		else if($botid == 71) $mode = "nwu";
+		else if($botid == 35) $mode = "legionmegaone";
+		else if($botid == 19) $mode = "battleships";
 	}
 ?>
 
@@ -73,6 +74,9 @@ if($row = $result->fetch()) {
 	<br />Bot name: <?= getBotName($row[0]) ?>
 	<? if($botid > 100 && !empty($row[4])) { ?>
 		<br />Owner: <?= $row[4] ?>
+	<? } ?>
+	<? if($row[5] != '-1') { ?>
+		<br />Duration: <?= sprintf('%02d:%02d:%02d', ($row[5]/3600),($row[5]/60%60), $row[5]%60) ?>
 	<? } ?></h2>
 	<table>
 	<tr>
@@ -108,6 +112,10 @@ if($row = $result->fetch()) {
 		} else if($mode == "rvs") {
 			$cutoff = 4;
 			$striped = true;
+		} else if($mode == "legionmegaone") {
+			$cutoff = 0;
+		} else if($mode == "battleships") {
+			$cutoff = 4;
 		}
 
 		include("elo.php");
@@ -146,7 +154,7 @@ if($row = $result->fetch()) {
 			} else {
 				$team = $i <= $cutoff ? 0 : 1;
 			}
-			
+
 			$player_teams[] = $team;
 			$team_ratings[$team] += $row[4];
 			$team_count[$team]++;
@@ -192,18 +200,18 @@ if($row = $result->fetch()) {
 
 	for($i = 0; $i < count($array) - 3; $i+=4) {
 		$array_index = $i;
-		
+
 		//if striped, the array index has to be specially calculated
 		if($striped) {
 			$slot_index = intval($i / 4); //this is the slot index, if the slots weren't striped!
-			
+
 			if($slot_index <= $cutoff) { //on first team
 				$array_index = $slot_index * 8;
 			} else { //on second team
 				$array_index = ($slot_index - $cutoff) * 8 - 4;
 			}
 		}
-		
+
 		if($mode != "" && $i % (($cutoff + 1) * 4) == 0) {
 			if($mode == "dota" || $mode == "lod" || $mode == "eihl") {
 				if($i == 0) {
@@ -211,7 +219,7 @@ if($row = $result->fetch()) {
 				} else {
 					$team = '<font color="#0B7600">Scourge</font>';
 				}
-			} else if($mode == "castlefight" || $mode == "legionmega" || $mode == "civwars") {
+			} else if($mode == "castlefight" || $mode == "legionmega" || $mode == "civwars" || $mode == "legionmegaone") {
 				if($i == 0) {
 					$team = "East";
 				} else {
