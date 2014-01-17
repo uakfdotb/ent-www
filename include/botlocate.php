@@ -82,7 +82,7 @@ $idToServer = array(
 	58 => 'unknown',
 	59 => 'atl',
 	60 => 'atl',
-	61 => 'unknown',
+	61 => 'atl',
 	62 => 'atl',
 	63 => 'atl',
 	64 => 'unknown',
@@ -100,17 +100,17 @@ $idToServer = array(
 	76 => 'unknown',
 	77 => 'atl',
 	78 => 'atl',
-	79 => 's12',
+	79 => 'chicago',
 	80 => 'unknown',
 	81 => 'unknown',
-	82 => 's12',
+	82 => 'chicago',
 	83 => 'atl',
 	84 => 'atl',
 	85 => 'atl',
 	86 => 'atl',
 	87 => 'atl',
-	88 => 's12',
-	89 => 'unknown',
+	88 => 'chicago',
+	89 => 'atl',
 	90 => 'ee',
 	91 => 'ee',
 	92 => 'ee',
@@ -126,21 +126,27 @@ $idToServer = array(
 	106 => 's4',
 	107 => 's4',
 	108 => 's4',
-	'201' => 's12',
-	'202' => 's12',
-	'203' => 's12',
-	'204' => 's12',
-	'301' => 's10',
-	'302' => 's10',
-	'303' => 's10',
-	'304' => 's10',
-	'401' => 's10',
-	'402' => 's10',
-	'403' => 's10',
-	'404' => 's10',);
+	'201' => 'chicago',
+	'202' => 'chicago',
+	'203' => 'chicago',
+	'204' => 'chicago',
+	'301' => 'nl',
+	'302' => 'nl',
+	'303' => 'nl',
+	'304' => 'nl',
+	'305' => 'nl',
+	'306' => 'nl',
+	'307' => 'nl',
+	'308' => 'nl',
+	'401' => 'la',
+	'402' => 'la',
+	'403' => 'la',
+	'404' => 'la');
 
 function getBotName($botid) {
-	if($botid < 100) {
+	if($botid == 60) {
+		return "ENTID";
+	} else if($botid < 100) {
 		return "ENT$botid";
 	} else if($botid < 101) {
 		return "ENT)RAND";
