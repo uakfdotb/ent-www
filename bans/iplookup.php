@@ -1,4 +1,5 @@
 <?php
+
 /*
 
 	ent-www
@@ -22,7 +23,7 @@
 */
 
 define('IN_PHPBB', true);
-$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : 'forum/';
+$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../forum/';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 require($phpbb_root_path . 'common.' . $phpEx);
 require($phpbb_root_path . 'includes/functions_user.'.$phpEx);
@@ -32,32 +33,34 @@ $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
 
-?>
+include("../include/common.php");
+include("../include/iplookup.php");
 
-<html>
-<body>
+if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
+    header('Location: /forum/ucp.php?mode=login');
+} else {
+	include("../include/dbconnect.php");
+	?>
 
-<p>This function requires whitelist. But if you're whitelisted, you can enter a player name here and get his or her IP address.</p>
+	<html>
+	<body>
 
-<form method="get" action="iplookup.php">
-Player (name@realm): <input type="text" name="player"> <input type="submit" value="Search">
-</form>
+	<p>This function requires whitelist. But if you're whitelisted, you can enter a player name here and get his or her IP address.</p>
 
-<table>
-<tr>
-	<th>IP</th>
-</tr>
+	<form method="get" action="iplookup.php">
+	Player (name@realm): <input type="text" name="player"> <input type="submit" value="Search">
+	</form>
 
-<?php
+	<table>
+	<tr>
+		<th>IP</th>
+	</tr>
 
-include("include/common.php");
-include("include/dbconnect.php");
-include("include/iplookup.php");
+	<?php
 
-$player = array("", "");
-$hours = 24 * 40;
+	$player = array("", "");
+	$hours = 24 * 40;
 
-if(isWhitelist($_SERVER['REMOTE_ADDR']) || isadmin($user->data['user_id'])) {
 	if(isset($_REQUEST['player'])) {
 		$player = getPlayer($_REQUEST['player']);
 	}
@@ -65,18 +68,23 @@ if(isWhitelist($_SERVER['REMOTE_ADDR']) || isadmin($user->data['user_id'])) {
 	if(isset($_REQUEST['hours'])) {
 		$hours = $_REQUEST['hours'];
 	}
+
+	$result = iplookup($player[0], $player[1], $hours);
+
+	while($row = $result->fetch()) {
+		$ip = htmlspecialchars($row[0]);
+		echo "<tr>\n";
+		echo "\t<td><a href=\"namelookup.php?ip=$ip\">$ip</a></td>\n";
+		echo "</tr>\n";
+	}
+
+	?>
+
+	</table>
+	<p><a href="./">back to index</a></p>
+	</body>
+	</html>
+	
+	<?
 }
-
-$result = iplookup($player[0], $player[1], $hours);
-
-while($row = $result->fetch()) {
-	echo "<tr>\n";
-	echo "\t<td>" . htmlspecialchars($row[0]) . "</td>\n";
-	echo "</tr>\n";
-}
-
 ?>
-
-</table>
-</body>
-</html>

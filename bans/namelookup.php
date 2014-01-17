@@ -1,4 +1,6 @@
-<!--
+<?php
+
+/*
 
 	ent-www
 	Copyright [2012-2013] [Jack Lu]
@@ -18,54 +20,75 @@
 	You should have received a copy of the GNU Affero General Public License
 	along with ent-www source code. If not, see <http://www.gnu.org/licenses/>.
 
--->
+*/
 
-<html>
-<body>
+define('IN_PHPBB', true);
+$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../forum/';
+$phpEx = substr(strrchr(__FILE__, '.'), 1);
+require($phpbb_root_path . 'common.' . $phpEx);
+require($phpbb_root_path . 'includes/functions_user.'.$phpEx);
 
-<p>Enter an IP address here, and I will look up the name. You can also enter a partial IP address, but make sure you have a leading dot. For example, "8.8.8.". But do not do "8.8.8", because you need leading dot or it won't do partial search.</p>
+// Start session management
+$user->session_begin();
+$auth->acl($user->data);
+$user->setup();
 
-<form method="get" action="namelookup.php">
-IP: <input type="text" name="ip"> <input type="submit" value="Search">
-</form>
+include("../include/common.php");
+include("../include/iplookup.php");
 
-<table>
-<tr>
-	<th>Name</th>
-	<th>Realm</th>
-	<th>Last seen</th>
-	<th>Count bans</th>
-	<th>Count games</th>
-	<th>Is banned?</th>
-</tr>
+if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
+    header('Location: /forum/ucp.php?mode=login');
+} else {
+	include("../include/dbconnect.php");
+	?>
 
-<?php
+	<html>
+	<body>
 
-include("include/common.php");
-include("include/dbconnect.php");
-include("include/iplookup.php");
+	<p>Enter an IP address here, and I will look up the name. You can also enter a partial IP address, but make sure you have a leading dot. For example, "8.8.8.". But do not do "8.8.8", because you need leading dot or it won't do partial search.</p>
 
-$ip = $_SERVER['REMOTE_ADDR'];
+	<form method="get" action="namelookup.php">
+	IP: <input type="text" name="ip"> <input type="submit" value="Search">
+	</form>
 
-if(isset($_REQUEST['ip'])) {
-	$ip = $_REQUEST['ip'];
+	<table>
+	<tr>
+		<th>Name</th>
+		<th>Realm</th>
+		<th>Last seen</th>
+		<th>Count bans</th>
+		<th>Count games</th>
+		<th>Is banned?</th>
+	</tr>
+
+	<?php
+
+	$ip = $_SERVER['REMOTE_ADDR'];
+
+	if(isset($_REQUEST['ip'])) {
+		$ip = $_REQUEST['ip'];
+	}
+
+	$result = namelookup($ip);
+
+	while($row = $result->fetch()) {
+		echo "<tr>\n";
+		echo "\t<td><a href=\"search.php?username=" . htmlspecialchars(urlencode($row[0])) . "&realm=" . htmlspecialchars(urlencode($row[1])) . "\">" . htmlspecialchars($row[0]) . "</a></td>\n";
+		echo "\t<td>" . htmlspecialchars($row[1]) . "</td>\n";
+		echo "\t<td>" . lastTimePlayed($row[0]) . "</td>\n";
+		echo "\t<td>" . countBans($row[0], $row[1]) . "</td>\n";
+		echo "\t<td>" . countGames($row[0], $row[1]) . "</td>\n";
+		echo "\t<td>" . isBanned($row[0], $row[1]) . "</td>\n";
+		echo "</tr>\n";
+	}
+
+	?>
+
+	</table>
+	<p><a href="./">back to index</a></p>
+	</body>
+	</html>
+	
+	<?
 }
-
-$result = namelookup($ip);
-
-while($row = $result->fetch()) {
-	echo "<tr>\n";
-	echo "\t<td><a href=\"bans/search.php?username=" . htmlspecialchars(urlencode($row[0])) . "&realm=" . htmlspecialchars(urlencode($row[1])) . "\">" . htmlspecialchars($row[0]) . "</a></td>\n";
-	echo "\t<td>" . htmlspecialchars($row[1]) . "</td>\n";
-	echo "\t<td>" . lastTimePlayed($row[0]) . "</td>\n";
-	echo "\t<td>" . countBans($row[0], $row[1]) . "</td>\n";
-	echo "\t<td>" . countGames($row[0], $row[1]) . "</td>\n";
-	echo "\t<td>" . isBanned($row[0], $row[1]) . "</td>\n";
-	echo "</tr>\n";
-}
-
 ?>
-
-</table>
-</body>
-</html>

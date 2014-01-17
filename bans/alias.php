@@ -1,4 +1,6 @@
-<!--
+<?php
+
+/*
 
 	ent-www
 	Copyright [2012-2013] [Jack Lu]
@@ -18,78 +20,95 @@
 	You should have received a copy of the GNU Affero General Public License
 	along with ent-www source code. If not, see <http://www.gnu.org/licenses/>.
 
--->
+*/
 
-<html>
-<body>
+define('IN_PHPBB', true);
+$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../forum/';
+$phpEx = substr(strrchr(__FILE__, '.'), 1);
+require($phpbb_root_path . 'common.' . $phpEx);
+require($phpbb_root_path . 'includes/functions_user.'.$phpEx);
 
-<p>Enter player name and realm and you'll see aliases. Make sure to use format, name@realm. For example, uakf.b@uswest.battle.net. The ".battle.net" is optional.</p>
+// Start session management
+$user->session_begin();
+$auth->acl($user->data);
+$user->setup();
 
-<form method="get" action="alias.php">
-Player (name@realm): <input type="text" name="player"> <input type="submit" value="Search">
-</form>
+include("../include/common.php");
+include("../include/iplookup.php");
 
-<table>
-<tr>
-	<th>Name</th>
-	<th>Realm</th>
-	<th>Last seen</th>
-	<th>Count bans</th>
-	<th>Count games</th>
-	<th>Is banned?</th>
-</tr>
+if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
+    header('Location: /forum/ucp.php?mode=login');
+} else {
+	include("../include/dbconnect.php");
+	?>
+	<html>
+	<body>
 
-<?php
+	<p>Enter player name and realm and you'll see aliases. Make sure to use format, name@realm. For example, uakf.b@uswest.battle.net. The ".battle.net" is optional.</p>
 
-include("include/common.php");
-include("include/dbconnect.php");
-include("include/iplookup.php");
+	<form method="get" action="alias.php">
+	Player (name@realm): <input type="text" name="player"> <input type="submit" value="Search">
+	</form>
 
-$player = array("", "");
-$hours = 24 * 30;
-$depth = 1;
+	<table>
+	<tr>
+		<th>Name</th>
+		<th>Realm</th>
+		<th>Last seen</th>
+		<th>Count bans</th>
+		<th>Count games</th>
+		<th>Is banned?</th>
+	</tr>
 
-if(isset($_REQUEST['player'])) {
-	$player = getPlayer($_REQUEST['player']);
-}
+	<?
+	$player = array("", "");
+	$hours = 24 * 30;
+	$depth = 1;
 
-if(isWhitelist($_SERVER['REMOTE_ADDR'])) {
+	if(isset($_REQUEST['player'])) {
+		$player = getPlayer($_REQUEST['player']);
+	}
+	
 	if(isset($_REQUEST['hours'])) {
 		$hours = $_REQUEST['hours'];
 	}
-	
+
 	if(isset($_REQUEST['depth'])) {
 		$depth = $_REQUEST['depth'];
 	}
-}
 
-$array = array();
-alias($player[0], $player[1], $depth, $array, $hours);
-$players = array();
+	$array = array();
+	alias($player[0], $player[1], $depth, $array, $hours);
+	$players = array();
 
-//construct map from player info string to last time played
-foreach($array as $p_str => $ignore) {
-	$p_info = getPlayer($p_str);
-	$players[$p_str] = strtotime(lastTimePlayed($p_info[0]));
-}
+	//construct map from player info string to last time played
+	foreach($array as $p_str => $ignore) {
+		$p_info = getPlayer($p_str);
+		$players[$p_str] = strtotime(lastTimePlayed($p_info[0]));
+	}
 
-arsort($players);
+	arsort($players);
 
-foreach($players as $p_str => $ignore) {
-	$p_info = getPlayer($p_str);
+	foreach($players as $p_str => $ignore) {
+		$p_info = getPlayer($p_str);
 	
-	echo "<tr>\n";
-	echo "\t<td><a href=\"bans/search.php?username=" . htmlspecialchars(urlencode($p_info[0])) . "&realm=" . htmlspecialchars(urlencode($p_info[1])) . "\">" . htmlspecialchars($p_info[0]) . "</a></td>\n";
-	echo "\t<td>" . htmlspecialchars($p_info[1]) . "</td>\n";
-	echo "\t<td>" . lastTimePlayed($p_info[0]) . "</td>\n";
-	echo "\t<td>" . countBans($p_info[0], $p_info[1]) . "</td>\n";
-	echo "\t<td>" . countGames($p_info[0], $p_info[1]) . "</td>\n";
-	echo "\t<td>" . isBanned($p_info[0], $p_info[1]) . "</td>\n";
-	echo "</tr>\n";
+		echo "<tr>\n";
+		echo "\t<td><a href=\"search.php?username=" . htmlspecialchars(urlencode($p_info[0])) . "&realm=" . htmlspecialchars(urlencode($p_info[1])) . "\">" . htmlspecialchars($p_info[0]) . "</a></td>\n";
+		echo "\t<td>" . htmlspecialchars($p_info[1]) . "</td>\n";
+		echo "\t<td>" . lastTimePlayed($p_info[0]) . "</td>\n";
+		echo "\t<td>" . countBans($p_info[0], $p_info[1]) . "</td>\n";
+		echo "\t<td>" . countGames($p_info[0], $p_info[1]) . "</td>\n";
+		echo "\t<td>" . isBanned($p_info[0], $p_info[1]) . "</td>\n";
+		echo "</tr>\n";
+	}
+
+	?>
+
+	</table>
+	<p><a href="./">back to index</a></p>
+	</body>
+	</html>
+	
+	<?
 }
-
 ?>
-
-</table>
-</body>
-</html>
