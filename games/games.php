@@ -32,29 +32,35 @@ $auth->acl($user->data);
 $user->setup();
 
 page_header('Games list');
+$isadmin = 'no';
 
 $bots = "";
 if($user->data['user_id'] != ANONYMOUS) {
 	include("../include/common.php");
 	include("../include/dbconnect.php");
-	
+
 	$result = databaseQuery("SELECT bots FROM validate, gametrack WHERE validate.buser = gametrack.name AND validate.brealm = gametrack.realm AND validate.fuser = ?", array($user->data['username_clean']));
 	$botArray = array();
-	
+
 	while($row = $result->fetch()) {
 		$botSub = explode(",", $row[0]);
-		
+
 		foreach($botSub as $bot) {
 			if(!empty($bot) && !in_array($bot, $botArray)) {
 				$botArray[] = $bot;
 			}
 		}
 	}
-	
+
 	$bots = implode(",", $botArray);
+
+	if(isadmin($user->data['user_id'])) {
+		$isadmin = 'yes';
+	}
 }
 
 $template->assign_vars(array('BOTS' => $bots));
+$template->assign_vars(array('ISADMIN' => $isadmin));
 $template->set_filenames(array(
                                'body' => 'games.html',
                                ));

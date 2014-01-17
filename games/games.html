@@ -1,12 +1,15 @@
 <!-- INCLUDE overall_header.html -->
 
 <LINK href="games.css" rel="stylesheet" type="text/css">
+<LINK href="/jquery-ui.css" rel="stylesheet" type="text/css">
 <h1>Games list</h1>
 
 <div class="panel">
    <div class="inner"><span class="corners-top"><span></span></span>
 
 <SCRIPT type="text/javascript" src="/jquery.js">
+</SCRIPT>
+<SCRIPT type="text/javascript" src="/jquery-ui.js">
 </SCRIPT>
 
 <SCRIPT type="text/javascript" src="/zeroclipboard/ZeroClipboard.js">
@@ -22,6 +25,15 @@ echo "var id = $id;"
 var inactiveCount = 0;
 var botsString = "{BOTS}";
 var botsArray = botsString.split(",");
+var isAdmin = '{ISADMIN}';
+
+function slotsFile() {
+	if(isAdmin == 'yes' && $('input[name=adminview]').is(':checked')) {
+		return 'slots_slow.php';
+	} else {
+		return 'slots_fast.php';
+	}
+}
 
 function refreshGames() {
 	if($('input[name=showall]').is(':checked')) {
@@ -29,7 +41,7 @@ function refreshGames() {
 	} else {
 		$.get('games_fast.php', {}, processGamesFast, 'html');
 	}
-	$('#playerstable').load('slots_fast.php?id=' + id);
+	$('#playerstable').load(slotsFile() + '?id=' + id);
 }
 
 var refreshId = setInterval(function()
@@ -120,6 +132,11 @@ function processGamesFast(data) {
 	allChecked = $('input[name=showall]').is(':checked') ? " checked" : "";
 	gamesTable += "<tr style=\"font-family:Helvetica, Arial, sans-serif; font-size:15px; margin-top:2px;\"><td colspan=\"3\"><input type=\"checkbox\" name=\"showall\" onchange=\"refreshGames();\"" + allChecked + "> Include games in progress</td></tr>";
 
+	if(isAdmin == 'yes') {
+		adminChecked = $('input[name=adminview]').is(':checked') ? " checked" : "";
+		gamesTable += "<tr style=\"font-family:Helvetica, Arial, sans-serif; font-size:15px; margin-top:2px;\"><td colspan=\"3\"><input type=\"checkbox\" name=\"adminview\" onchange=\"refreshGames();\"" + adminChecked + "> Use administration view</td></tr>";
+	}
+
 	gamesTable += "<tr><td colspan=\"3\"><img src=\"blank.gif\" onload=\"init();\"></td></tr>";
 	$('#gamestable').html(gamesTable);
 }
@@ -127,7 +144,7 @@ function processGamesFast(data) {
 function updateId(newId) {
 	id = newId;
 	inactiveCount = 0;
-	$('#playerstable').load('slots_fast.php?id=' + id);
+	$('#playerstable').load(slotsFile() + '?id=' + id);
 }
 
 if($('input[name=showall]').is(':checked')) {
@@ -145,26 +162,70 @@ if($('input[name=showall]').is(':checked')) {
 
 </td><td style="text-align:top;padding-left:50px;">
 
-<div id="playerstable">
-<!-- PHP -->
-include("slots_fast.php");
-<!-- ENDPHP -->
-</div>
+<style>
+/* required to avoid jumping */
+#playerstableWrapper {
+  position: absolute;
+  width: 100%;
+}
 
-<script type="text/javascript"><!--
-google_ad_client = "ca-pub-0857519020745551";
-/* ad3 */
-google_ad_slot = "6710306422";
-google_ad_width = 336;
-google_ad_height = 280;
-//-->
-</script>
-<script type="text/javascript"
-src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
+#playerstableWrapper2 {
+  position: absolute;
+  top: 0;
+}
+
+#playerstableWrapper2.fixed {
+  position: fixed;
+  top: 0;
+}
+</style>
+
+<div id="playerstableWrapper">
+	<div id="playerstableWrapper2">
+		<div id="playerstable">
+		<!-- PHP -->
+		include("slots_fast.php");
+		<!-- ENDPHP -->
+		</div>
+
+		<hr>
+
+		<script type="text/javascript"><!--
+		google_ad_client = "ca-pub-0857519020745551";
+		/* ad3 */
+		google_ad_slot = "6710306422";
+		google_ad_width = 336;
+		google_ad_height = 280;
+		//-->
+		</script>
+		<script type="text/javascript"
+		src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
+		</script>
+	</div>
+</div>
 
 </td></tr>
 </table>
+
+<script type="text/javascript">
+// this is script to make the playerstable float with scrolling
+$(document).ready(function () {
+	var top = $('#playerstableWrapper2').offset().top - parseFloat($('#playerstableWrapper2').css('marginTop').replace(/auto/, 0));
+	$(window).scroll(function (event) {
+		// what the y position of the scroll is
+		var y = $(this).scrollTop();
+
+		// whether that's below the form
+		if (y >= top) {
+			// if so, ad the fixed class
+			$('#playerstableWrapper2').addClass('fixed');
+		} else {
+			// otherwise remove it
+			$('#playerstableWrapper2').removeClass('fixed');
+		}
+	});
+});
+</script>
 
 <SCRIPT type="text/javascript">
 ZeroClipboard.setMoviePath('/zeroclipboard/ZeroClipboard.swf');
@@ -186,7 +247,6 @@ function init() {
   clip.receiveEvent('mouseover', null);
  });
 }
-
 </SCRIPT>
 
 <br /><br />
