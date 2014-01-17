@@ -108,6 +108,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		<option value="24">Days</option>
 		<option value="168">Weeks</option>
 		</select>
+	<br />Bot ID: <input type="text" name="targetbot" /> (enter a bot ID to only ban on one specific bot; otherwise leave blank)
 	<br /><input type="checkbox" name="unban" value="unban" /> Unban user (if not checked, user will be banned)
 	<br /><input type="checkbox" name="reban" value="reban" /> Force reban user (if already banned, delete old ban)
 	<br /><input type="submit" value="Ban user" />
@@ -124,102 +125,124 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 
 		//make sure reason is set and good; no validation if we're unbanning though
 		if(isset($_POST['reason']) && strlen($_POST['reason']) >= 6 && strlen($_POST['reason']) <= 255 && ($unban || !empty($_POST['category']))) {
-			$username = strtolower(trim($_POST['username']));
-			$realm = $_POST['realm'];
-			
-			if($unban) {
-				$reason = "Unban by " . $username_clean . ": " . $_POST['reason'];
-			} else {
-				$reason = $_POST['reason'] . " (" . $_POST['category'] . ")";
-			}
-			
-			$duration = intval($_POST['duration']) * 3600;
-			$is_ip = isset($_POST['isip']); //whether the entered username is actually an IP address
+			$usernames = explode(',', strtolower($_POST['username']));
 
-			if(!empty($_POST['duration_num']) && !empty($_POST['duration_period'])) {
-				$duration = $_POST['duration_num'] * $_POST['duration_period'] * 3600;
-			}
+			foreach($usernames as $username) {
+				$username = trim($username);
+				$realm = $_POST['realm'];
+				$targetbot = 0;
 
-			//maximum duration is a year
-			if($duration <= 31104000) {
-				$realms = array("uswest.battle.net", "useast.battle.net", "europe.battle.net", "asia.battle.net", "entconnect", "");
-				if($realm != "") $realms = array($realm);
-
-				if($unban) {
-					adminLog("Unban", "Unbanning $username@$realm", $username_clean);
-				} else {
-					adminLog("Ban", "Banning $username@$realm", $username_clean);
+				if(!empty($_POST['targetbot'])) {
+					$targetbot = intval($_POST['targetbot']);
 				}
 
-				foreach($realms as $realm_it) {
-					if($realm_it == "garena") {
-						$realm_it = "";
-					}
-					
-					$where = "WHERE name = '$username' AND spoofedrealm = '$realm_it'";
+				if($unban) {
+					$reason = "Unban by " . $username_clean . ": " . $_POST['reason'];
+				} else {
+					$reason = $_POST['reason'] . " (" . $_POST['category'] . ")";
+				}
 
-					//unban the user if we're supposed to
-					if($unban || $reban) {
-						echo "<br /><b>Unbanning user on " . $realm_it . "</b>";
-						
-						$unban_reason = $reason;
-						
-						if($reban) {
-							$unban_reason = "Force reban";
-						}
-						
-						databaseQuery("UPDATE ban_history, bans SET unban_reason = ? WHERE bans.id = ban_history.banid AND ((bans.name = ? AND bans.server = ?) OR (bans.ip = ?))", array($unban_reason, $username, $realm_it, $username));
-						databaseQuery("DELETE FROM bans WHERE name = ? AND server = ?", array($username, $realm_it));
-						databaseQuery("UPDATE bans SET ip = '' WHERE ip = ?", array($username));
-						
-						if($unban) {
-							continue;
-						}
-					}
+				$duration = intval($_POST['duration']) * 3600;
+				$is_ip = isset($_POST['isip']); //whether the entered username is actually an IP address
 
-					echo "<br /><b>Banning user on " . $realm_it . " for " . $duration . " seconds</b>";
+				if(!empty($_POST['duration_num']) && !empty($_POST['duration_period'])) {
+					$duration = $_POST['duration_num'] * $_POST['duration_period'] * 3600;
+				}
 
-					//make sure user isn't already banned
-					$result = databaseQuery("SELECT COUNT(*) FROM bans WHERE name = ? AND server = ? AND context = 'ttr.cloud'", array($username, $realm_it));
-					$row = $result->fetch();
-					if($row[0] > 0) {
-						echo "<br />Error: user already banned on this realm; unban first and try again if you want to make sure all IPs are banned";
+				//maximum duration is a year
+				if($duration <= 31104000) {
+					$realms = array("uswest.battle.net", "useast.battle.net", "europe.battle.net", "asia.battle.net", "entconnect", "");
+
+					//extract realm from username, if set
+					$username_realm_parts = explode('@', $username);
+					if(count($username_realm_parts) == 2) {
+						$username = $username_realm_parts[0];
+						$realm = $username_realm_parts[1];
+
+						if($realm == 'west' || $realm == 'uswest') $realm = 'uswest.battle.net';
+						else if($realm == 'east' || $realm == 'useast') $realm = 'useast.battle.net';
+						else if($realm == 'euro' || $realm == 'europe') $realm = 'europe.battle.net';
+						else if($realm == 'asia') $realm = 'asia.battle.net';
+					} else if(count($usernames) > 1) { //if banning multiple users, we require them to use user-specific realm feature
+						echo "<br />Error: banning multiple usernames but realm not set for [" . htmlspecialchars($username) . "]";
 						continue;
 					}
 
-					//last few IP addresses logged; limited to 15 addresses within the last 30 days
-					$result = databaseQuery("SELECT DISTINCT ip FROM gameplayers LEFT JOIN games ON gameplayers.gameid = games.id $where AND datetime > DATE_SUB( NOW( ), INTERVAL 30 DAY) ORDER BY gameplayers.id DESC LIMIT 15");
+					if($realm != "") $realms = array($realm);
 
-					if($result->rowCount() > 0) {
-						while($row = $result->fetch()) {
-							$ip = $row[0];
-							echo "<br />Banning " . $ip;
-
-							//if this is for non-spoofchecked users, ban on USWest by default
-							$ban_realm = $realm_it;
-							if($ban_realm == "" && $realm != "garena") $ban_realm = "uswest.battle.net";
-
-							databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context) VALUES ('0', ?, ?, ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL ? second ), 'ttr.cloud')", array($ban_realm, $username, $ip, $username_clean, $reason, $duration));
-						}
+					if($unban) {
+						adminLog("Unban", "Unbanning $username@$realm", $username_clean);
 					} else {
-						//no previous games found; ban by username only if this is an actual realm
-						if($realm_it != "" || $realm == "garena") {
-							echo "<br />No IPs found on this realm, just banning by username";
-							
-							$ip = "";
-							
-							if($is_ip) {
-								$ip = $username;
+						adminLog("Ban", "Banning $username@$realm", $username_clean);
+					}
+
+					foreach($realms as $realm_it) {
+						if($realm_it == "garena") {
+							$realm_it = "";
+						}
+
+						$where = "WHERE name = '$username' AND spoofedrealm = '$realm_it'";
+
+						//unban the user if we're supposed to
+						if($unban || $reban) {
+							echo "<br /><b>Unbanning " . htmlspecialchars($username) . " on " . $realm_it . "</b>";
+
+							$unban_reason = $reason;
+
+							if($reban) {
+								$unban_reason = "Force reban";
 							}
-							
-							databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context) VALUES ('0', ?, ?, ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL ? second ), 'ttr.cloud')", array($realm_it, $username, $ip, $username_clean, $reason, $duration));
+
+							databaseQuery("UPDATE ban_history, bans SET unban_reason = ? WHERE bans.id = ban_history.banid AND ((bans.name = ? AND bans.server = ?) OR (bans.ip = ?))", array($unban_reason, $username, $realm_it, $username));
+							databaseQuery("DELETE FROM bans WHERE name = ? AND server = ?", array($username, $realm_it));
+							databaseQuery("UPDATE bans SET ip = '' WHERE ip = ?", array($username));
+
+							if($unban) {
+								continue;
+							}
+						}
+
+						echo "<br /><b>Banning " . htmlspecialchars($username) . " on " . $realm_it . " for " . $duration . " seconds</b>";
+
+						//make sure user isn't already banned
+						$result = databaseQuery("SELECT COUNT(*) FROM bans WHERE name = ? AND server = ? AND context = 'ttr.cloud'", array($username, $realm_it));
+						$row = $result->fetch();
+						if($row[0] > 0) {
+							echo "<br />Error: [" . htmlspecialchars($username) . "] already banned on [$realm_it]; unban first and try again if you want to make sure all IPs are banned";
+							continue;
+						}
+
+						//last few IP addresses logged; limited to 15 addresses within the last 30 days
+						$result = databaseQuery("SELECT DISTINCT ip FROM gameplayers LEFT JOIN games ON gameplayers.gameid = games.id $where AND datetime > DATE_SUB( NOW( ), INTERVAL 30 DAY) ORDER BY gameplayers.id DESC LIMIT 15");
+
+						if($result->rowCount() > 0) {
+							while($row = $result->fetch()) {
+								$ip = $row[0];
+								echo "<br />Banning " . $ip;
+								$ban_realm = $realm_it;
+
+								databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context, targetbot) VALUES ('0', ?, ?, ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL ? second ), 'ttr.cloud', ?)", array($ban_realm, $username, $ip, $username_clean, $reason, $duration, $targetbot));
+							}
 						} else {
-							echo "<br />No IPs found on this realm, skipping because this is non-spoofchecked \"realm\"";
+							//no previous games found; ban by username only if this is an actual realm
+							if($realm_it != "" || $realm == "garena") {
+								echo "<br />No IPs found on [$realm_it] just banning by username [" . htmlspecialchars($username) . "]";
+
+								$ip = "";
+
+								if($is_ip) {
+									$ip = $username;
+								}
+
+								databaseQuery("INSERT INTO bans (botid, server, name, ip, date, gamename, admin, reason, expiredate, context, targetbot) VALUES ('0', ?, ?, ?, CURDATE(), '', ?, ?, DATE_ADD( NOW( ), INTERVAL ? second ), 'ttr.cloud', ?)", array($realm_it, $username, $ip, $username_clean, $reason, $duration, $targetbot));
+							} else {
+								echo "<br />No IPs found on [$realm_it], skipping because this is non-spoofchecked \"realm\"";
+							}
 						}
 					}
+				} else {
+					echo "<p><b><i>Error: duration too long.</i></b></p>";
 				}
-			} else {
-				echo "<p><b><i>Error: duration too long.</i></b></p>";
 			}
 		} else {
 			echo "<p><b><i>Error: please keep reason between 6 and 255 characters (make sure category is selected as well).</i></b></p>";
