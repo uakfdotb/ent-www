@@ -46,16 +46,10 @@ include("include/dbconnect.php");
 include("include/iplookup.php");
 
 $player = "";
-$hours = 24 * 30;
+$hours = 24 * 60;
 
 if(isset($_REQUEST['player'])) {
 	$player = $_REQUEST['player'];
-}
-
-if(isWhitelist($_SERVER['REMOTE_ADDR'])) {
-	if(isset($_REQUEST['hours'])) {
-		$hours = $_REQUEST['hours'];
-	}
 }
 
 $result = simname($player);
