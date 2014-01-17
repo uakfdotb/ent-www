@@ -79,6 +79,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		<option value="asia.battle.net">Asia</option>
 		<option value="entconnect">Ent Connect</option>
 		<option value="garena">Garena</option>
+		<option value="server.eurobattle.net">EuroBattle</option>
 		<option value="">All realms (use with caution!)</option>
 		</select>
 	<br />Duration: <select name="duration">
