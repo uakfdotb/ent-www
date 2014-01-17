@@ -56,7 +56,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		$n = intval($_REQUEST['n']);
 	}
 	
-	if(isset($_REQUEST['filter'])) {
+	if(!empty($_REQUEST['filter'])) {
 		$filterElement = "%" . $_REQUEST['filter'] . "%";
 		$filter = "WHERE admin LIKE ? OR `desc` LIKE ? OR action LIKE ?";
 		$parameters = array($filterElement, $filterElement, $filterElement);
