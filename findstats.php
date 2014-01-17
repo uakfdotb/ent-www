@@ -58,7 +58,7 @@ if(isset($_REQUEST['id'])) {
 			$statsmode = "legionmega";
 		} else if($botid == 35) {
 			$statstype = "custom";
-			$statsmode = "legionmega2";
+			$statsmode = "legionmegaone";
 		} else if($botid == 15) {
 			$statstype = "custom";
 			$statsmode = "treetag";
