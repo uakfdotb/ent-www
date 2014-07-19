@@ -26,7 +26,7 @@ $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../forum/';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 require($phpbb_root_path . 'common.' . $phpEx);
 require($phpbb_root_path . 'includes/functions_user.'.$phpEx);
- 
+
 // Start session management
 $user->session_begin();
 $auth->acl($user->data);
@@ -39,23 +39,23 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
     header('Location: /forum/ucp.php?mode=login');
 } else {
 	include("../include/dbconnect.php");
-	
+
 	$username_clean = $user->data['username_clean'];
-	
+
 	//timezone stuff
 	date_default_timezone_set(AUTOMATIC_DST_TIMEZONE);
 	$timezoneAbbr = timezoneAbbr(AUTOMATIC_DST_TIMEZONE);
 	?>
-	
+
 	<html>
 	<head><title>ENT Ban - User Search</title></head>
 	<body>
 	<h1>Search a user</h1>
-	
+
 	<p>You can search for a user on this page using the form below. All realms separately will display statistics for the username on each realm, while all realms aggregated will ignore the realm completely and just look up based on username. When using all realms separately or aggregated, you will also be able to see statistics when the username was not spoof checked; for the former, this will be labeled like "uakf.b@", with nothing following the @ symbol.</p>
-	
+
 	<p>Your timezone is <?= $timezoneAbbr ?>. The current time is <?= uxtDate() ?>.</p>
-	
+
 	<form method="GET" action="search.php">
 	Username: <input type="text" name="username" />
 	<br />Realm: <select name="realm">
@@ -66,34 +66,34 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		<option value="europe.battle.net">Europe</option>
 		<option value="asia.battle.net">Asia</option>
 		<option value="entconnect">Ent Connect</option>
-		<option value="cloud.ghostclient.com">Ghost Client</option>
+		<option value="server.eurobattle.net">EuroBattle</option>
 		<option value="">Garena</option>
 		</select>
 	<br /><input type="submit" value="Search" />
 	</form>
-	
+
 	<?
-	
+
 	if(isset($_REQUEST['username']) && $_REQUEST['username'] != '' && isset($_REQUEST['realm'])) {
 		$username = trim($_REQUEST['username']);
 		$realm = trim($_REQUEST['realm']);
-		
-		$realms = array("", "uswest.battle.net", "useast.battle.net", "europe.battle.net", "asia.battle.net", "entconnect", "cloud.ghostclient.com");
+
+		$realms = array("", "uswest.battle.net", "useast.battle.net", "europe.battle.net", "asia.battle.net", "entconnect", "server.eurobattle.net");
 		if($realm != "") $realms = array($realm);
-		
+
 		foreach($realms as $realm_it) {
 			$where = "WHERE name = ?";
 			$parameters = array($username);
-			
+
 			if($realm_it != "*") {
 				$where .= " AND realm = ?";
 				$parameters[] = $realm_it;
 			}
-			
+
 			//grab general statistics
 			$result = databaseQuery("SELECT time_created, time_active, num_games, (total_leftpercent / num_games)*100, (num_autoban / num_games)*100, lastgames, ROUND(playingtime / 3600) FROM gametrack $where", $parameters);
 			$row = $result->fetch();
-			
+
 			$firstgame = uxtDate(convertTime($row[0]));
 			$lastgame = uxtDate(convertTime($row[1]));
 			$totalgames = $row[2];
@@ -101,9 +101,9 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 			$leftpercent = $row[4];
 			$lastgames = $row[5];
 			$playingtime = $row[6];
-			
+
 			echo "<h2>" . htmlspecialchars($username) . "@" . htmlspecialchars($realm_it) . "</h2>";
-			
+
 			if($totalgames != 0) {
 				echo "<h3>General statistics</h3>";
 				echo "<table>";
@@ -114,35 +114,36 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 				echo "<tr><td>Stay percent</td><td>" . $staypercent . "</td></tr>";
 				echo "<tr><td>Left percent</td><td>" . $leftpercent . "</td></tr>";
 				echo "<tr><td>Playing time</td><td>" . $playingtime . " hours</td></tr>";
+				echo "<tr><td>Tools</td><td><a href=\"alias.php?player=" . htmlspecialchars($username) . "\">alias</a>, <a href=\"hostlookup.php?filter_type=name&filter=" . htmlspecialchars($username) . "\">hostname</a>, <a href=\"iplookup.php?player=" . htmlspecialchars($username) . "\">iplookup</a>, <a href=\"ban.php?ban_username=" . htmlspecialchars("$username@$realm_it"). "\">ban</a></td></tr>";
 				echo "</table>";
-			
+
 				//last few games
 				echo "<h3>Last few games</h3>";
-				
+
 				$lastgames = explode(",", $lastgames);
-				
+
 				echo "<ul>";
 				//process in reverse
 				for($i = count($lastgames) - 1; $i >= 0 && $i >= count($lastgames) - 12; $i--) {
 					$gameid = $lastgames[$i];
 					$result = databaseQuery("SELECT gamename FROM games WHERE id = ?", array($gameid));
-					
+
 					if($row = $result->fetch()) {
 						echo "<li><a href=\"game.php?id=$gameid\">" . $row[0] . "</a></li>";
 					}
 				}
 				echo "<li><b><a href=\"games.php?username=" . urlencode($username) . "&realm=" . urlencode($realm_it) . "\">More</a></b></li>";
 				echo "</ul>";
-				
+
 				//ban history
 				$result = databaseQuery("SELECT admin, reason, gamename, date, expiredate, unban_reason, banid FROM ban_history WHERE name = ? AND server = ? ORDER BY id DESC LIMIT 6", array($username, $realm_it));
-				
+
 				if($result->rowCount() > 0) {
 					echo "<h3>Ban history</h3>";
-				
+
 					echo "<table cellpadding=\"2\">";
 					echo "<tr><th>Admin</th><th>Reason</th><th>Gamename</th><th>Date</th><th>Expire</th><th>Unban</th></tr>";
-					
+
 					while($row = $result->fetch()) {
 						echo "<tr>";
 						echo "<td>" . htmlentities($row[0]) . "</td>";
@@ -153,7 +154,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 						echo "<td style=\"padding-left:15px;\">" . niceUnbanReason($row[5], $row[6]) . "</td>";
 						echo "</tr>";
 					}
-					
+
 					if($result->rowCount() == 6) {
 						$result = databaseQuery("SELECT COUNT(*) FROM ban_history WHERE name = ? AND server = ?", array($username, $realm_it));
 						$row = $result->fetch();
@@ -161,7 +162,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 						echo "<td colspan=\"5\"><a href=\"banhist.php?name=" . urlencode($username) . "&server=" . urlencode($realm_it) . "\">More (total: {$row[0]})</a></td>";
 						echo "</tr>";
 					}
-					
+
 					echo "</table>";
 				}
 			} else {
@@ -170,11 +171,11 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		}
 	}
 	?>
-	
+
 	<p><a href="./">back to index</a></p>
 	</body>
 	</html>
-	
+
 	<?
 }
 ?>
