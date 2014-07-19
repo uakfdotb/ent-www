@@ -42,6 +42,12 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	include("../include/dbconnect.php");
 
 	$username_clean = $user->data['username_clean'];
+
+	$ban_username = "";
+
+	if(isset($_GET['ban_username'])) {
+		$ban_username = htmlspecialchars($_GET['ban_username']);
+	}
 	?>
 
 	<html>
@@ -58,7 +64,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<p>Note that only IP addresses used within the last 15 days will be banned. This is so that innocent users are not banned.</p>
 
 	<form method="POST" action="ban.php">
-	Username: <input type="text" name="username" /> <input type="checkbox" name="isip" value="true" /> Check if this is an IP address
+	Username: <input type="text" name="username" value="<?= $ban_username ?>" /> <input type="checkbox" name="isip" value="true" /> Check if this is an IP address
 	<br />Reason: <input type="text" name="reason" />
 	<br />Category: <select name="category">
 		<option value=""></option>
