@@ -60,8 +60,8 @@ function processGamesFast(data) {
 	var gamesTable = "<tr><th class=\"games\">Gamename</th><th class=\"games\">&nbsp;&nbsp;Slots&nbsp;&nbsp;</th><th class=\"games\">Copy&nbsp;</th><th class=\"games\">&nbsp;&nbsp;Connect</th></tr>";
 	var gamesArray = data.split("\n");
 
-	for(var k = 0; k < 3; k++) { //first pass: preferred games; second pass: other games; third pass: non-lobby games
-		if(k == 1 || k == 2) {
+	for(var k = 0; k < 4; k++) { //first pass: preferred games; second pass: public hosting games; third pass: other games; fourth pass: non-lobby games
+		if(k > 0) {
 			gamesTable += "<tr><td colspan=\"4\"><hr></td></tr>";
 		}
 
@@ -72,43 +72,16 @@ function processGamesFast(data) {
 				var rowid = parseInt(rowArray[0]);
 				var botid = parseInt(rowArray[1]);
 
-				if(k < 2 && rowArray[4] == "0") {
+				if(k < 3 && rowArray[4] == "0") {
 					continue;
-				} else if(k == 2 && rowArray[4] == "1") {
+				} else if(k == 3 && rowArray[4] == "1") {
 					continue;
 				} else if($('input[name=hideempty]').is(':checked') && rowArray[2] == "0") {
 					continue;
 				} else if($('input[name=hidedota]').is(':checked') && rowArray[5].toLowerCase().indexOf("dota") != -1) {
 					continue;
-				} else if((k == 0 && $.inArray(botid + "", botsArray) == -1) || (k == 1 && $.inArray(botid + "", botsArray) != -1)) {
+				} else if(!(k == 0 && $.inArray(botid + "", botsArray) != -1 && botid < 100) && !(k == 1 && botid >= 100) && !(k == 2 && $.inArray(botid + "", botsArray) == -1 && botid < 100) && k != 3) {
 					continue;
-				}
-
-				//get the ghostclient id
-				var gcId = 0;
-
-				if(botid >= 101 && botid <= 108) {
-					gcId = botid + 165;
-				} else if(botid == 1 || botid == 2) {
-					gcId = botid + 47;
-				} else if(botid >= 4 && botid <= 36) {
-					gcId = botid + 46;
-				} else if(botid >= 37 && botid <= 40) {
-					gcId = botid + 115;
-				} else if(botid >= 4 && botid <= 36) {
-					gcId = botid + 46;
-				} else if(botid == 47) {
-					gcId = 157;
-				} else if(botid == 57) {
-					gcId = 158;
-				} else if(botid >= 41 && botid <= 46) {
-					gcId = botid + 118;
-				} else if(botid >= 48 && botid <= 56) {
-					gcId = botid + 117;
-				} else if(botid >= 58 && botid <= 69) {
-					gcId = botid + 116;
-				} else if(botid >= 70 && botid <= 81) {
-					gcId = botid + 138;
 				}
 
 				gamesTable += "<tr onmousedown=\"updateId(" + rowArray[0] + ");\" style=\"font-family:Helvetica, Arial, sans-serif; font-size:15px; margin-top:2px;\">";
@@ -116,8 +89,7 @@ function processGamesFast(data) {
 				gamesTable += "<a style=\"color: maroon;\">";
 				gamesTable += rowArray[5] + "</a></td><td style=\"padding-left:10px;\">" + rowArray[2] + "/" + rowArray[3];
 				gamesTable += "</td><td><img height=\"18\" width=\"18\" class=\"copiable\" src=\"clipboard.png\" gamename=\"" + rowArray[5] + "\" ></td>";
-				gamesTable += "<td><center><a href=\"ghostclient:?connect=" + gcId + "\"><img src=\"gc.png\"></a>";
-				gamesTable += "&nbsp;<a href=\"/entconnect/?filter=" + encodeURIComponent(rowArray[5]) + "\" target=\"_blank\"><img src=\"ec.png\"></a></center></td>";
+				gamesTable += "<td><a href=\"/entconnect/?filter=" + encodeURIComponent(rowArray[5]) + "\" target=\"_blank\"><img src=\"ec.png\"></a></center></td>";
 				gamesTable += "</tr>";
 			}
 		}
