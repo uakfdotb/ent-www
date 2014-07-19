@@ -49,7 +49,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<body>
 	<h1>Whitelist</h1>
 
-	<p>This is a list of whitelisted users on ENT Connect. They won't be subject to IP bans of other accounts. Add or remove a whitelisted user using the form below, or view the list of users.</p>
+	<p>This is a list of whitelisted users and IP addresses. They won't be subject to IP bans of other accounts. Add or remove a whitelisted user using the form below, or view the list of users. (Note: whitelist should be of the form username@realm to whitelist usernames, except for ENT Connect which you should only include username. For IP addresses, enter the IP address preceded by a colon or a partial prefix preceded by a colon, like ":127.0.0.1" or ":127.0.0.".)</p>
 
 	<form method="POST" action="whitelist.php">
 	Username: <input type="text" name="username" />
