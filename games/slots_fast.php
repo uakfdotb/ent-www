@@ -46,7 +46,7 @@ if(!isset($id) || $id == 0) {
 	include("../include/botlocate.php");
 }
 
-$result = databaseQuery("SELECT botid, gamename, usernames, lobby, ownername, IFNULL(TIMESTAMPDIFF(SECOND, eventtime, NOW()), '-1') FROM gamelist WHERE id = ?", array($id));
+$result = databaseQuery("SELECT botid, gamename, usernames, lobby, ownername, IFNULL(TIMESTAMPDIFF(SECOND, eventtime, NOW()), '-1'), map FROM gamelist WHERE id = ?", array($id));
 if($row = $result->fetch()) {
 	$botid = $row[0];
 
@@ -66,18 +66,21 @@ if($row = $result->fetch()) {
 		else if($botid == 60) $mode = "islanddefense";
 		else if($botid == 71) $mode = "nwu";
 		else if($botid == 35) $mode = "legionmegaone";
+		else if($botid == 31) $mode = "legionmega_nc";
 		else if($botid == 19) $mode = "battleships";
+		else if($botid == 49) $mode = "enfo";
 	}
 ?>
 
-	<h2>Gamename: <?= $row[1] ?>
-	<br />Bot name: <?= getBotName($row[0]) ?>
+	<h2><b>Gamename</b>: <?= htmlspecialchars($row[1]) ?>
+	<br /><b>Bot name</b>: <?= getBotName($row[0]) ?>
 	<? if($botid > 100 && !empty($row[4])) { ?>
-		<br />Owner: <?= $row[4] ?>
+		<br /><b>Owner</b>: <?= $row[4] ?>
 	<? } ?>
 	<? if($row[5] != '-1') { ?>
-		<br />Duration: <?= sprintf('%02d:%02d:%02d', ($row[5]/3600),($row[5]/60%60), $row[5]%60) ?>
-	<? } ?></h2>
+		<br /><b>Duration</b>: <?= sprintf('%02d:%02d:%02d', ($row[5]/3600),($row[5]/60%60), $row[5]%60) ?>
+	<? } ?>
+	<br /><b>Map</b>: <?= htmlspecialchars(basename(str_replace("\\", "/", $row[6]))) ?></h2>
 	<table>
 	<tr>
 		<th class="games">Username</th>
@@ -103,7 +106,7 @@ if($row = $result->fetch()) {
 
 		if($mode == "castlefight" || $mode == "civwars" || $mode == "herolinewars") {
 			$cutoff = 2;
-		} else if($mode == "legionmega") {
+		} else if($mode == "legionmega" || $mode == "legionmega_nc") {
 			$cutoff = 3;
 		} else if($mode == "treetag") {
 			$cutoff = 8;
@@ -116,6 +119,8 @@ if($row = $result->fetch()) {
 			$cutoff = 0;
 		} else if($mode == "battleships") {
 			$cutoff = 4;
+		} else if($mode == "enfo") {
+			$cutoff = 3;
 		}
 
 		include("elo.php");
@@ -219,7 +224,7 @@ if($row = $result->fetch()) {
 				} else {
 					$team = '<font color="#0B7600">Scourge</font>';
 				}
-			} else if($mode == "castlefight" || $mode == "legionmega" || $mode == "civwars" || $mode == "legionmegaone") {
+			} else if($mode == "castlefight" || $mode == "legionmega" || $mode == "civwars" || $mode == "legionmegaone" || $mode == "legionmega_nc") {
 				if($i == 0) {
 					$team = "East";
 				} else {
