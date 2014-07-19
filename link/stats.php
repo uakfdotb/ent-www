@@ -65,8 +65,10 @@ if ($user->data['user_id'] == ANONYMOUS) {
 
 	if(isset($_POST['action'])) {
 		if(check_form_key('link_stats')) { //CSRF protection
-			if(time() - genericForumPreferencesGet($fuser, "link_stats_last_action", 0) >= 600) { //flood protection
-				if($_POST['action'] == "swap" && isset($_POST['source']) && isset($_POST['target']) && isset($_POST['category'])) {
+			if(time() - genericForumPreferencesGet($fuser, "link_stats_last_action", 0) >= 600 && isset($_POST['category'])) { //flood protection
+				if($_POST['category'] == 'lihl') {
+					$message = "LIHL stats cannot be self-managed.";
+				} else if($_POST['action'] == "swap" && isset($_POST['source']) && isset($_POST['target'])) {
 					//check validation and no same source/target
 					$source_info = getPlayer($_POST['source']);
 					$target_info = getPlayer($_POST['target']);
