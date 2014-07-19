@@ -43,10 +43,10 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	exit;
 }
 
-if(isset($_POST['action']) && $_POST['action'] == 'kick' && isset($_REQUEST['username'])) {
-	$username = $_REQUEST['username'];
-	databaseQuery("INSERT INTO commands (botid, command) VALUES (?, ?)", array(0, "!kick $username"));
-	adminLog("Gamelist lobby kick", "Kicking $username from lobbies", $user->data['username_clean']);
+if(isset($_POST['action']) && $_POST['action'] == 'ipkick' && isset($_REQUEST['ip'])) {
+	$ip = $_REQUEST['ip'];
+	databaseQuery("INSERT INTO commands (botid, command) VALUES (?, ?)", array(0, "!ipkick $ip"));
+	adminLog("Gamelist lobby kick", "Kicking $ip from lobbies", $user->data['username_clean']);
 	exit;
 }
 
@@ -122,7 +122,7 @@ if($row = $result->fetch()) {
 		} else {
 			$safe_username = htmlentities($username);
 			$safer_username = json_encode($safe_username);
-			echo "<tr><td class=\"slot\" id=\"$safer_username\"><a href=\"javascript:actionDialog('$safe_username');\">$safe_username</a></td>";
+			echo "<tr><td class=\"slot\" id=\"$safer_username\"><a href=\"javascript:actionDialog('$safe_username', '$ip');\">$safe_username</a></td>";
 
 			echo "<td class=\"slot\">$realm</td>";
 			echo "<td class=\"slot\">$ping</td>";
@@ -145,17 +145,21 @@ $csrftoken = csrfguard_generate_token($csrfname);
 </table>
 
 <script type="text/javascript">
-function actionDialog(username) {
-	$('body').append('<div id="dialog_' + username + '"><h2>' + username + '</h3></div>');
-	$('#dialog_' + username).dialog({
+function actionDialog(username, ip) {
+	var uid = Math.floor(Math.random() * 99999999);
+	$('body').append('<div id="dialog_' + uid + '"><h2>' + username + ' (' + ip + ')</h2></div>');
+	$('#dialog_' + uid).dialog({
 		height: 150,
 		modal: true,
 		buttons: {
-			Kick: function() {
-				$.post('/forum/slots_slow.php', {'CSRFName': '<?= $csrfname ?>', 'CSRFToken': '<?= $csrftoken ?>', 'action': 'kick', 'username': username});
+			'Kick': function() {
+				$.post('/forum/slots_slow.php', {'CSRFName': '<?= $csrfname ?>', 'CSRFToken': '<?= $csrftoken ?>', 'action': 'ipkick', 'ip': ip});
 				$(this).dialog('close');
 			},
-			Cancel: function() {
+			'Ban search': function() {
+				window.open('/bans/search.php?realm=&username=' + username, '_blank');
+			},
+			'Cancel': function() {
 				$(this).dialog('close');
 			}
 		}
