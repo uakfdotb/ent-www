@@ -46,6 +46,10 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	$search = "";
 	$filterbyreason = false;
 	$filterbyreasonchecked = "";
+	$filterbyhostname = false;
+	$filterbyhostnamechecked = "";
+	$publichosting = false;
+	$publichostingchecked = "";
 
 	if(isset($_REQUEST['search'])) {
 		$search = $_REQUEST['search'];
@@ -54,6 +58,16 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	if(isset($_REQUEST['filterbyreason']) && $_REQUEST['filterbyreason'] == 'yes') {
 		$filterbyreason = true;
 		$filterbyreasonchecked = "checked";
+	}
+
+	if(isset($_REQUEST['filterbyhostname']) && $_REQUEST['filterbyhostname'] == 'yes') {
+		$filterbyhostname = true;
+		$filterbyhostnamechecked = "checked";
+	}
+
+	if(isset($_REQUEST['publichosting']) && $_REQUEST['publichosting'] == 'yes') {
+		$publichosting = true;
+		$publichostingchecked = "checked";
 	}
 
 	//timezone stuff
@@ -75,23 +89,51 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<form method="get" action="bans.php">
 	Filter: <input type="text" name="search" value="<?= htmlentities($search) ?>" />
 	<br /><input type="checkbox" name="filterbyreason" value="yes" <?= $filterbyreasonchecked ?>/> Include matches in the reason field in results
+	<br /><input type="checkbox" name="filterbyhostname" value="yes" <?= $filterbyhostnamechecked ?>/> Include hostname matches in the IP field (rDNS)
+	<br /><input type="checkbox" name="publichosting" value="yes" <?= $publichostingchecked ?>/> Including public hosting bans
 	<br /><input type="submit" value="Filter" />
 	</form>
 
 	<table cellpadding="2">
-	<tr><th>Username</th><th>Realm</th><th>IP</th><th>Admin</th><th>Gamename</th><th>Date</th><th>Expires on</th><th>Reason</th></tr>
+	<tr>
+		<th>Username</th>
+		<th>Realm</th>
+		<th>IP</th>
+		<th>Admin</th>
+		<th>Gamename</th>
+		<th>Date</th>
+		<th>Expires on</th>
+		<th>Reason</th>
+		<? if($publichosting) { ?><th>Context</th><? } ?>
+	</tr>
 
 	<?
 
 	if(strlen($search) >= 3) {
 		$select = "SELECT * FROM bans";
-		$where = "WHERE (context = 'ttr.cloud' OR context = '' OR context IS NULL) AND (name LIKE ? OR ip LIKE ? OR admin LIKE ? OR (LENGTH(ip) > 2 AND SUBSTR(ip, 1, 1) = ':' AND SUBSTR(ip, 2) = SUBSTR(?, 1, LENGTH(ip) - 1)) OR (LENGTH(ip) > 3 AND SUBSTR(ip, 1, 2) = ':h' AND ? LIKE CONCAT('%', SUBSTR(ip, 3), '%')))";
+		$where = "WHERE (name LIKE ? OR ip LIKE ? OR admin LIKE ? OR (LENGTH(ip) > 2 AND SUBSTR(ip, 1, 1) = ':' AND SUBSTR(ip, 2) = SUBSTR(?, 1, LENGTH(ip) - 1)) OR (LENGTH(ip) > 3 AND SUBSTR(ip, 1, 2) = ':h' AND ? LIKE CONCAT('%', SUBSTR(ip, 3), '%'))";
 		$orderby = "ORDER BY id";
 		$vars = array("%$search%", "%$search%", "%$search%", "$search", "$search");
 
 		if($filterbyreason) {
 			$where .= " OR reason LIKE ?";
 			$vars[] = "%$search%";
+		}
+
+		if($filterbyhostname) {
+			$where .= " OR hostname LIKE ?";
+			$vars[] = "%$search%";
+		}
+
+		if(filter_var($search, FILTER_VALIDATE_IP)) {
+		    $where .= " OR (LENGTH(ip) > 3 AND SUBSTR(ip, 1, 2) = ':h' AND ? LIKE CONCAT('%', SUBSTR(ip, 3), '%'))";
+		    $vars[] = gethostbyaddr($search);
+		}
+
+		$where .= ")";
+
+		if(!$publichosting) {
+			$where .= " AND (context = 'ttr.cloud' OR context = '' OR context IS NULL)";
 		}
 
 		$result = databaseQuery($select . " " . $where . " " . $orderby, $vars, true);
@@ -124,11 +166,28 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 			$expiredate = dayDate(convertTime($row['expiredate']));
 
 			//process reason to change links to links and tid's to links as well
-			$reason = niceReason($row['reason']);
+			$reason = $row['reason'];
+
+			if($row['targetbot'] != 0) {
+				$reason .= " (botid={$row['targetbot']} only)";
+			}
+
+			$reason = niceReason($reason);
 
 			echo "<td>" . $date . "</td>";
 			echo "<td>" . $expiredate . "</td>";
 			echo "<td>" . $reason . "</td>";
+
+			if($publichosting) {
+				$context = htmlspecialchars($row['context']);
+
+				if($context == 'ttr.cloud' || $context == '') {
+					$context = "<b>ENT</b>";
+				}
+
+				echo "<td>$context</td>";
+			}
+
 			echo "</tr>";
 		}
 	}
