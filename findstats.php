@@ -59,6 +59,9 @@ if(isset($_REQUEST['id'])) {
 		} else if($botid == 35) {
 			$statstype = "custom";
 			$statsmode = "legionmegaone";
+		} else if($botid == 31) {
+			$statstype = "custom";
+			$statsmode = "legionmega_nc";
 		} else if($botid == 15) {
 			$statstype = "custom";
 			$statsmode = "treetag";
@@ -80,6 +83,9 @@ if(isset($_REQUEST['id'])) {
 		} else if($botid == 71) {
 			$statstype = "custom";
 			$statsmode = "nwu";
+		} else if($botid == 49) {
+			$statstype = "custom";
+			$statsmode = "enfo";
 		}
 
 		if($statstype !== 0) {
@@ -117,11 +123,11 @@ function fsHeader() {
 
 function fsShowStats($gid) {
 	$result = databaseQuery("SELECT gamename, datetime, map, duration, ownername FROM games WHERE id = ?", array($gid));
-	
+
 	if($row = $result->fetch()) {
 		$gid = htmlspecialchars($gid);
 		echo "<p><b><i><a href=\"/replay.php?id=$gid\">Click here to download the replay for this game.</a></i></b></p>";
-	
+
 		echo "<table>";
 		echo "<tr>";
 		echo "<td><b>Game name</b></td>";
@@ -151,7 +157,7 @@ function fsShowStats($gid) {
 		echo "<td><b>Lobby chat</b></td>";
 		echo "<td><a href=\"/replay.php?id=$gid&chat\">($gid)</a></td>";
 		echo "</tr>";
-		
+
 		echo "<table cellpadding=\"5\">";
 		echo "<tr>";
 		echo "<th>Player name</th>";
@@ -159,9 +165,9 @@ function fsShowStats($gid) {
 		echo "<th>Left</th>";
 		echo "<th>Reason</th>";
 		echo "</tr>";
-		
+
 		$result = databaseQuery("SELECT name, spoofedrealm, `left`, leftreason FROM gameplayers WHERE gameid = ? ORDER BY colour", array($gid));
-		
+
 		while($row = $result->fetch()) {
 			echo "<tr>";
 			echo "<td><a href=\"findreplay.php?player=" . htmlspecialchars(urlencode($row[0])) . "@" . htmlspecialchars(urlencode($row[1])) . "\">" . htmlspecialchars($row[0]) . "</a></td>";
@@ -170,7 +176,7 @@ function fsShowStats($gid) {
 			echo "<td>" . htmlspecialchars($row[3]) . "</td>";
 			echo "</tr>";
 		}
-		
+
 		echo "</table>";
 	}
 }
