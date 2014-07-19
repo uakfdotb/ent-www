@@ -153,7 +153,7 @@ function getBotName($botid) {
 	} else if($botid < 200) {
 		return "Ent.Hosting" . ($botid - 100);
 	} else if($botid < 300) {
-		return "Ent.Chicago" . ($botid - 200);
+		return "Ent.NY" . ($botid - 200);
 	} else if($botid < 400) {
 		return "Ent.Europe" . ($botid - 300);
 	} else if($botid < 500) {
