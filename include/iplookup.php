@@ -65,7 +65,12 @@ function simname($name, $hours = 336) {
 	return databaseQuery("SELECT DISTINCT name, spoofedrealm FROM gameplayers LEFT JOIN games ON games.id = gameplayers.gameid WHERE name LIKE ? AND games.datetime > DATE_SUB( NOW( ), INTERVAL ? HOUR) LIMIT 150", array($name, $hours));
 }
 
-function namelookup($ip) {
+function namelookup($ip, $gamename = '') {
+	$select = "SELECT DISTINCT name, spoofedrealm";
+	$from = "gameplayers";
+	$where = "";
+	$vars = array();
+
 	if(substr($ip, -1) == ".") {
 		$parts = explode(".", $ip);
 		$safe_ip = "";
@@ -79,11 +84,23 @@ function namelookup($ip) {
 		}
 
 		if($counter >= 2) {
-			return databaseQuery("SELECT DISTINCT name, spoofedrealm FROM gameplayers WHERE ip LIKE ? ORDER BY id DESC LIMIT 100", array("$safe_ip%"));
+			$where = "gameplayers.ip LIKE ?";
+			$vars[] = "$safe_ip%";
 		}
 	}
 
-	return databaseQuery("SELECT DISTINCT name, spoofedrealm FROM gameplayers WHERE ip = ?", array($ip));
+	if($where == "") {
+		$where = "gameplayers.ip = ?";
+		$vars[] = $ip;
+	}
+
+	if($gamename) {
+		$from .= ", games";
+		$where .= " AND games.id = gameplayers.gameid AND games.gamename LIKE ?";
+		$vars[] = "%$gamename%";
+	}
+
+	return databaseQuery("$select FROM $from WHERE $where ORDER BY gameplayers.id DESC LIMIT 100", $vars);
 }
 
 function alias($name, $realm, $depth = 1, &$array, $hours = 720, &$iparray = array()) {
@@ -140,6 +157,12 @@ function countGames($name, $realm) {
 	} else {
 		return 0;
 	}
+}
+
+function countGamesIP($ip) {
+	$result = databaseQuery("SELECT COUNT(*) FROM gameplayers WHERE ip = ?", array($ip));
+	$row = $result->fetch();
+	return $row[0];
 }
 
 function isBanned($name, $realm) {
