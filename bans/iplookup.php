@@ -54,6 +54,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<table>
 	<tr>
 		<th>IP</th>
+		<th># games</th>
 	</tr>
 
 	<?php
@@ -75,6 +76,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		$ip = htmlspecialchars($row[0]);
 		echo "<tr>\n";
 		echo "\t<td><a href=\"namelookup.php?ip=$ip\">$ip</a></td>\n";
+		echo "\t<td>" . countGamesIP($ip) . "</td>\n";
 		echo "</tr>\n";
 	}
 
@@ -84,7 +86,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<p><a href="./">back to index</a></p>
 	</body>
 	</html>
-	
+
 	<?
 }
 ?>
