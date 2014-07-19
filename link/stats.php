@@ -78,7 +78,7 @@ if ($user->data['user_id'] == ANONYMOUS) {
 					} else {
 						$message = "Invalid source/target account. This incident has been reported to the ENT web administration team.";
 					}
-				} else if($_POST['action'] == "clear" && isset($_POST['account']) && isset($_POST['category'])) {
+				} else if($_POST['action'] == "clear" && isset($_POST['account'])) {
 					$p_info = getPlayer($_POST['account']);
 					$isValidated = isValidated($p_info[0], $p_info[1]);
 
