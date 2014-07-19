@@ -49,12 +49,12 @@ if ($user->data['user_id'] == ANONYMOUS) {
 		$location = $_REQUEST['location'];
 		$gamename = $fuser . rand(10, 99);
 		$type = "pub";
-		
+
 		if(isset($_REQUEST['private'])) {
 			$type = "priv";
 		}
 
-		if($location != "atlanta" && $location != "chicago" && $location != "seattle" && $location != "europe" && $location != "la") {
+		if($location != "atlanta" && $location != "ny" && $location != "seattle" && $location != "europe" && $location != "la" && $location != "au" && $location != "jp") {
 			$location = "atlanta";
 		}
 
@@ -64,36 +64,36 @@ if ($user->data['user_id'] == ANONYMOUS) {
 			$map = substr($map, 1);
 			$maptype = "load";
 		}
-		
+
 		$observers = 0;
-		
+
 		if(isset($_REQUEST['observers'])) {
 			$observers = 1;
 		}
-		
+
 		//make sure no games like this already
 		$result = databaseQuery("SELECT COUNT(*) FROM gamequeue WHERE username = ? OR gamename LIKE ?", array($owner, "{$fuser}__"));
 		$row = $result->fetch();
-		
+
 		if($row[0] > 0) {
 			$message = "Error hosting game: you appear to already have a game in the hosting queue. Please <a href=\"host.php\">go back to the hosting page</a> and check the queue to see the status of hosting your game.";
 		} else {
 			$result = databaseQuery("SELECT gamename FROM gamelist WHERE (ownername = ? OR gamename LIKE ?) AND lobby = 1", array($owner, "{$fuser}__"));
-			
+
 			if($row = $result->fetch()) {
 				$message = "Error hosting game: you appear to already have a game hosted. Check the <a href=\"/forum/games.php\">game list</a> (the gamename is <b>" . htmlspecialchars($row[0]) . "</b>).";
 			} else {
 				databaseQuery("INSERT INTO gamequeue (realm, username, gamename, command, mapname, maptype, location, obs) VALUES ('1', ?, ?, ?, ?, ?, ?, ?)", array($owner, $gamename, $type, $map, $maptype, $location, $observers));
 				$message = "The game should be hosted shortly (the gamename is your forum username followed by two digits; you can change this with !pub NEW GAMENAME after you join the game). If it doesn't host, make sure that you don't already have hosted and that the selected map is valid.<br /><br /><b>GAMENAME: $gamename</b><br /><br />Note: if there are too many games hosted, your host request may be queued. You can <a href=\"host.php\">check the queue status here</a>.";
-		
+
 				//if user hasn't hosted in thirty minutes, increment host counter
 				if(time() - genericForumPreferencesGet($fuser, "link_host_time", 0) > 30 * 60) {
 					databaseQuery("UPDATE makemehost_maps SET count = count + 1 WHERE randname = ?", array(substr($_REQUEST['map'], 1)));
 				}
-		
+
 				//save the owner for future hosting
 				genericForumPreferencesSet($fuser, "link_host_owner", $_REQUEST['owner']);
-		
+
 				//also updated last host time
 				genericForumPreferencesSet($fuser, "link_host_time", time());
 			}
@@ -128,17 +128,17 @@ if ($user->data['user_id'] == ANONYMOUS) {
 										'MAP_DESC' => htmlspecialchars($row[0] . " (uploaded by " . getMapUploaderName($row[2]) . ")")
 										));
 		}
-		
+
 		//also get the default owner to use
 		$owner = genericForumPreferencesGet($fuser, "link_host_owner", $fuser);
 		$template->assign_var('OWNER', htmlspecialchars($owner));
-		
+
 		//oh and the hosting queue for each location
-		$locations = array("seattle", "europe", "atlanta", "chicago", "la");
-		
+		$locations = array("seattle", "europe", "atlanta", "ny", "la", "au", "jp");
+
 		foreach($locations as $location) {
 			$result = databaseQuery("SELECT username, gamename, position FROM gamequeue_status WHERE location = ? ORDER BY position", array($location));
-			
+
 			while($row = $result->fetch()) {
 				$template->assign_block_vars("queue_$location", array(
 											 'QUEUE_USER' => htmlspecialchars($row[0]),

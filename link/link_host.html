@@ -22,10 +22,12 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 <br />Location:
 	<select name="location">
 	<option value="atlanta">Atlanta (U.S. East)</option>
-	<option value="chicago">Chicago (U.S. Central)</option>
+	<option value="ny">New York (U.S. East)</option>
 	<option value="la">Los Angeles (U.S. West)</option>
 	<option value="seattle">Seattle (U.S. West)</option>
 	<option value="europe">Germany (Europe)</option>
+	<option value="au">Australia</option>
+	<option value="jp">Japan</option>
 	</select>
 <br /><input type="checkbox" name="private" value="true" /> Make the game private (you can rehost it after joining the lobby)
 <br /><input type="checkbox" name="observers" value="true" /> Add observer slots
@@ -44,11 +46,11 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 <li class="donate" style="margin-left:20px">{queue_atlanta.QUEUE_GAMENAME} (by {queue_atlanta.QUEUE_USER})</li>
 <!-- END queue_atlanta -->
 </ol>
-<li class="donate">Chicago (U.S. Central)</li>
+<li class="donate">New York (U.S. East)</li>
 <ol>
-<!-- BEGIN queue_chicago -->
-<li class="donate" style="margin-left:20px">{queue_chicago.QUEUE_GAMENAME} (by {queue_chicago.QUEUE_USER})</li>
-<!-- END queue_chicago -->
+<!-- BEGIN queue_ny -->
+<li class="donate" style="margin-left:20px">{queue_ny.QUEUE_GAMENAME} (by {queue_ny.QUEUE_USER})</li>
+<!-- END queue_ny -->
 </ol>
 <li class="donate">Los Angeles (U.S. West)</li>
 <ol>
@@ -67,6 +69,20 @@ Owner name (your in-game username): <input type="text" name="owner" value="{OWNE
 <!-- BEGIN queue_europe -->
 <li class="donate" style="margin-left:20px">{queue_europe.QUEUE_GAMENAME} (by {queue_europe.QUEUE_USER})</li>
 <!-- END queue_europe -->
+</ol>
+</ul>
+<li class="donate">Australia</li>
+<ol>
+<!-- BEGIN queue_au -->
+<li class="donate" style="margin-left:20px">{queue_au.QUEUE_GAMENAME} (by {queue_au.QUEUE_USER})</li>
+<!-- END queue_au -->
+</ol>
+</ul>
+<li class="donate">Japan</li>
+<ol>
+<!-- BEGIN queue_jp -->
+<li class="donate" style="margin-left:20px">{queue_jp.QUEUE_GAMENAME} (by {queue_jp.QUEUE_USER})</li>
+<!-- END queue_jp -->
 </ol>
 </ul>
 
