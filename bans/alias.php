@@ -40,6 +40,24 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
     header('Location: /forum/ucp.php?mode=login');
 } else {
 	include("../include/dbconnect.php");
+
+	$player_raw = '';
+	$player = array("", "");
+	$hours = 24 * 30;
+	$depth = 1;
+
+	if(isset($_REQUEST['player'])) {
+		$player_raw = $_REQUEST['player'];
+		$player = getPlayer($player_raw);
+	}
+
+	if(isset($_REQUEST['hours'])) {
+		$hours = $_REQUEST['hours'];
+	}
+
+	if(isset($_REQUEST['depth'])) {
+		$depth = $_REQUEST['depth'];
+	}
 	?>
 	<html>
 	<body>
@@ -52,30 +70,15 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 
 	<table>
 	<tr>
-		<th>Name</th>
-		<th>Realm</th>
-		<th>Last seen</th>
-		<th>Count bans</th>
-		<th>Count games</th>
-		<th>Is banned?</th>
+		<th><a href="alias.php?sort=name&player=<?= htmlspecialchars($player_raw) ?>">Name</a></th>
+		<th><a href="alias.php?sort=realm&player=<?= htmlspecialchars($player_raw) ?>">Realm</a></th>
+		<th><a href="alias.php?sort=last_time_sort&player=<?= htmlspecialchars($player_raw) ?>">Last seen</a></th>
+		<th><a href="alias.php?sort=count_ban&player=<?= htmlspecialchars($player_raw) ?>">Count bans</a></th>
+		<th><a href="alias.php?sort=count_game&player=<?= htmlspecialchars($player_raw) ?>">Count games</a></th>
+		<th><a href="alias.php?sort=isbanned&player=<?= htmlspecialchars($player_raw) ?>">Is banned?</a></th>
 	</tr>
 
 	<?
-	$player = array("", "");
-	$hours = 24 * 30;
-	$depth = 1;
-
-	if(isset($_REQUEST['player'])) {
-		$player = getPlayer($_REQUEST['player']);
-	}
-	
-	if(isset($_REQUEST['hours'])) {
-		$hours = $_REQUEST['hours'];
-	}
-
-	if(isset($_REQUEST['depth'])) {
-		$depth = $_REQUEST['depth'];
-	}
 
 	$array = array();
 	alias($player[0], $player[1], $depth, $array, $hours);
@@ -84,21 +87,43 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	//construct map from player info string to last time played
 	foreach($array as $p_str => $ignore) {
 		$p_info = getPlayer($p_str);
-		$players[$p_str] = strtotime(lastTimePlayed($p_info[0]));
+		$players[$p_str] = array(
+			'name' => $p_info[0],
+			'realm' => $p_info[1],
+			'last_time_sort' => strtotime(lastTimePlayed($p_info[0])),
+			'last_time' => lastTimePlayed($p_info[0]),
+			'count_ban' => countBans($p_info[0], $p_info[1]),
+			'count_game' => countGames($p_info[0], $p_info[1]),
+			'isbanned' => isBanned($p_info[0], $p_info[1])
+			);
 	}
 
-	arsort($players);
+	$sort_key = 'last_time_sort';
 
-	foreach($players as $p_str => $ignore) {
+	if(isset($_GET['sort']) && ($_GET['sort'] == 'name' || $_GET['sort'] == 'realm' || $_GET['sort'] == 'last_time_sort' || $_GET['sort'] == 'count_ban' || $_GET['sort'] == 'count_game' || $_GET['sort'] == 'isbanned')) {
+		$sort_key = $_GET['sort'];
+	}
+
+	$sort_function = function($a, $b) use ($sort_key) {
+		if($sort_key == 'name' || $sort_key == 'realm' || $sort_key == 'isbanned') {
+			return strcmp($a[$sort_key], $b[$sort_key]);
+		} else {
+			return $b[$sort_key] - $a[$sort_key];
+		}
+	};
+
+	uasort($players, $sort_function);
+
+	foreach($players as $p_str => $p_data) {
 		$p_info = getPlayer($p_str);
-	
+
 		echo "<tr>\n";
 		echo "\t<td><a href=\"search.php?username=" . htmlspecialchars(urlencode($p_info[0])) . "&realm=" . htmlspecialchars(urlencode($p_info[1])) . "\">" . htmlspecialchars($p_info[0]) . "</a></td>\n";
 		echo "\t<td>" . htmlspecialchars($p_info[1]) . "</td>\n";
-		echo "\t<td>" . lastTimePlayed($p_info[0]) . "</td>\n";
-		echo "\t<td>" . countBans($p_info[0], $p_info[1]) . "</td>\n";
-		echo "\t<td>" . countGames($p_info[0], $p_info[1]) . "</td>\n";
-		echo "\t<td>" . isBanned($p_info[0], $p_info[1]) . "</td>\n";
+		echo "\t<td>" . $p_data['last_time'] . "</td>\n";
+		echo "\t<td>" . $p_data['count_ban'] . "</td>\n";
+		echo "\t<td>" . $p_data['count_game'] . "</td>\n";
+		echo "\t<td>" . $p_data['isbanned'] . "</td>\n";
 		echo "</tr>\n";
 	}
 
@@ -108,7 +133,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<p><a href="./">back to index</a></p>
 	</body>
 	</html>
-	
+
 	<?
 }
 ?>
