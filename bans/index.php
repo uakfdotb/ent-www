@@ -62,7 +62,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 	<li><a href="alias.php">Find player aliases</a></li>
 	<li><a href="namelookup.php">Find players who have used given IP address</a></li>
 	<li><a href="iplookup.php">Find IP addresses that a player has used</a></li>
-	<li><a href="/simname.php">Search for names by wildcard</a></li>
+	<li><a href="simname.php">Search for names by wildcard</a></li>
 	<li><a href="hostlookup.php">Search for/by hostname</a></li>
 	<li><a href="together.php">Find frequently played with</a></li>
 	</ul>
