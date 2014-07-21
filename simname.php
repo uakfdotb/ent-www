@@ -68,5 +68,7 @@ while($p_info = $result->fetch()) {
 ?>
 
 </table>
+//Move sinname.php into /bans/
+<p><a href="./">back to index</a></p>
 </body>
 </html>
