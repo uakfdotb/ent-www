@@ -55,7 +55,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		if($_REQUEST['filter_type'] == "host") {
 			$where = "gameplayers.hostname LIKE ?";
 		} else if($_REQUEST['filter_type'] == "name") {
-			$where = "gameplayers.name = ?";
+			$where = "gameplayers.name LIKE ?";
 		}
 
 		if(!empty($_REQUEST['gamename'])) {
