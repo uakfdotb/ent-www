@@ -33,13 +33,13 @@ $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
 
-include("include/common.php");
-include("include/iplookup.php");
+include("../include/common.php");
+include("../include/iplookup.php");
 
 if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
     header('Location: /forum/ucp.php?mode=login');
 } else {
-	include("include/dbconnect.php");
+	include("../include/dbconnect.php");
 	?>
 
 	<html>
@@ -74,7 +74,7 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 
 	while($p_info = $result->fetch()) {
 		echo "<tr>\n";
-		echo "\t<td><a href=\"bans/search.php?username=" . htmlspecialchars(urlencode($p_info[0])) . "&realm=" . htmlspecialchars(urlencode($p_info[1])) . "\">" . htmlspecialchars($p_info[0]) . "</a></td>\n";
+		echo "\t<td><a href=\"search.php?username=" . htmlspecialchars(urlencode($p_info[0])) . "&realm=" . htmlspecialchars(urlencode($p_info[1])) . "\">" . htmlspecialchars($p_info[0]) . "</a></td>\n";
 		echo "\t<td>" . htmlspecialchars($p_info[1]) . "</td>\n";
 		echo "\t<td>" . lastTimePlayed($p_info[0]) . "</td>\n";
 		echo "\t<td>" . countBans($p_info[0], $p_info[1]) . "</td>\n";
