@@ -58,7 +58,7 @@ if($row = $result->fetch()) {
 		else if(($botid >= 5 && $botid <= 11) || strpos(strtolower($row[1]), "dota") !== FALSE) $mode = "dota";
 		else if($botid == 1) $mode = "castlefight";
 		else if($botid == 15) $mode = "treetag";
-		else if($botid == 18 || $botid == 57 || $botid == 79 || $botid == 96) $mode = "legionmega";
+		else if($botid == 18 || $botid == 57 || $botid == 79 || $botid == 96 || $botid == 31) $mode = "legionmega";
 		else if(strpos(strtolower($row[1]), "lihl") !== FALSE) $mode = "lihl";
 		else if($botid == 16) $mode = "civwars";
 		else if($botid == 82) $mode = "rvs";
@@ -66,7 +66,6 @@ if($row = $result->fetch()) {
 		else if($botid == 60) $mode = "islanddefense";
 		else if($botid == 71) $mode = "nwu";
 		else if($botid == 35) $mode = "legionmegaone";
-		else if($botid == 31) $mode = "legionmega_nc";
 		else if($botid == 19) $mode = "battleships";
 		else if($botid == 49) $mode = "enfo";
 	}
