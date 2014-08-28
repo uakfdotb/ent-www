@@ -51,7 +51,7 @@ if ($user->data['user_id'] == ANONYMOUS) {
 		databaseQuery("UPDATE makemehost_session SET sessionkey = ? WHERE user_id = ?", array($key, $user_id));
 	}
 
-	header("Location: http://maps.entgaming.net/makemehost/auth.php?user_id=$user_id&key=$key");
+	header("Location: http://maps.entgaming.net/auth.php?user_id=$user_id&key=$key");
 }
 
 ?>
