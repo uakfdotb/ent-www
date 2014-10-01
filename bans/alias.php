@@ -90,8 +90,8 @@ if ($user->data['user_id'] == ANONYMOUS || !isadmin($user->data['user_id'])) {
 		$players[$p_str] = array(
 			'name' => $p_info[0],
 			'realm' => $p_info[1],
-			'last_time_sort' => strtotime(lastTimePlayed($p_info[0])),
-			'last_time' => lastTimePlayed($p_info[0]),
+			'last_time_sort' => strtotime(lastTimePlayed($p_info[0], $p_info[1])),
+			'last_time' => lastTimePlayed($p_info[0], $p_info[1]),
 			'count_ban' => countBans($p_info[0], $p_info[1]),
 			'count_game' => countGames($p_info[0], $p_info[1]),
 			'isbanned' => isBanned($p_info[0], $p_info[1])

@@ -136,8 +136,8 @@ function alias($name, $realm, $depth = 1, &$array, $hours = 720, &$iparray = arr
 	}
 }
 
-function lastTimePlayed($name) {
-	$result = databaseQuery("SELECT MAX(games.datetime) FROM gameplayers LEFT JOIN games ON gameplayers.gameid = games.id WHERE gameplayers.name = ?", array($name));
+function lastTimePlayed($name, $realm) {
+	$result = databaseQuery("SELECT MAX(games.datetime) FROM gameplayers LEFT JOIN games ON gameplayers.gameid = games.id WHERE gameplayers.name = ? AND gameplayers.spoofedrealm = ?", array($name, $realm));
 	$row = $result->fetch();
 
 	if(is_null($row[0])) return "Never";
